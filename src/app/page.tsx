@@ -2,14 +2,19 @@ import Faq from "@/components/Faq";
 import Footer from "@/components/Footer";
 import Founder from "@/components/Founder";
 import Hero from "@/components/Hero";
+import Hero2 from "@/components/hero2";
 import OurWork from "@/components/OurWork";
 import Services from "@/components/Services";
+import Services2 from "@/components/Services2";
 import Testimonial from "@/components/Testimonial";
+import WorkSection from "@/components/WorkSection";
 
 export default function HomePage() {
   return (
     <main>
-      <Hero
+      <Hero2/>
+      <Services2/>
+      {/* <Hero
         mainImage="/images/hero/main.jpg"
         smallTop="/images/hero/top.jpg"
         smallMid="/images/hero/mid.jpg"
@@ -23,9 +28,10 @@ export default function HomePage() {
           "App Development",
           "SEO Services",
         ]}
-      />
-      <Services/>
-      <OurWork/>
+      /> */}
+      {/* <Services/> */}
+      {/* <OurWork/> */}
+      <WorkSection/>
       <Testimonial/>
       <Founder/>
       <Faq/>
