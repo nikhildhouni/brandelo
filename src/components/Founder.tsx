@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Instagram, Facebook, Linkedin } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 
 type Social = { href: string; type: "instagram" | "facebook" | "linkedin" };
 type Props = {
@@ -25,14 +25,17 @@ export default function FounderSection({
     { type: "linkedin", href: "https://linkedin.com/" },
   ],
 }: Props) {
-  // simple variants for staggered entranceð
-  const container = {
+  // Framer Motion v11: use tuple easings (not strings)
+  const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
+
+  const container: Variants = {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { staggerChildren: 0.12, delayChildren: 0.1 } },
   };
-  const fadeUp = {
+
+  const fadeUp: Variants = {
     hidden: { opacity: 0, y: 18 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE_OUT } },
   };
 
   return (
@@ -45,10 +48,7 @@ export default function FounderSection({
         viewport={{ once: true, amount: 0.25 }}
       >
         {/* Left: Founder Illustration + Socials */}
-        <motion.div
-          variants={fadeUp}
-          className="relative flex justify-center md:justify-start"
-        >
+        <motion.div variants={fadeUp} className="relative flex justify-center md:justify-start">
           <motion.div
             className="relative inline-block will-change-transform"
             whileHover={{ rotate: -0.3, scale: 1.01 }}
@@ -61,7 +61,7 @@ export default function FounderSection({
               initial={{ opacity: 0, x: 20, y: 20 }}
               whileInView={{ opacity: 1, x: 0, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.5, ease: EASE_OUT }}
             />
             {/* Image card */}
             <motion.div
@@ -69,7 +69,7 @@ export default function FounderSection({
               initial={{ opacity: 0, y: 20, scale: 0.98 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
+              transition={{ duration: 0.6, ease: EASE_OUT }}
             >
               <Image
                 src={imageSrc}
@@ -89,7 +89,7 @@ export default function FounderSection({
               initial={{ opacity: 0, x: -10 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
+              transition={{ duration: 0.5, delay: 0.2, ease: EASE_OUT }}
             >
               {socials.map((s) => (
                 <SocialIcon key={s.type} {...s} />
@@ -107,7 +107,10 @@ export default function FounderSection({
             transition={{ type: "spring", stiffness: 250, damping: 18 }}
           >
             <span className="relative">
-              <span className="absolute -inset-0.5 rounded bg-white/10 blur-sm dark:bg-white/5" aria-hidden />
+              <span
+                className="absolute -inset-0.5 rounded bg-white/10 blur-sm dark:bg-white/5"
+                aria-hidden
+              />
               <span className="relative z-10 font-semibold">Meet the Founder</span>
             </span>
           </motion.div>
@@ -132,8 +135,7 @@ export default function FounderSection({
 
 /* ——— Social icon button with theme-aware contrast + hover motion ——— */
 function SocialIcon({ href, type }: Social) {
-  const Icon =
-    type === "instagram" ? Instagram : type === "facebook" ? Facebook : Linkedin;
+  const Icon = type === "instagram" ? Instagram : type === "facebook" ? Facebook : Linkedin;
 
   return (
     <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.96 }}>
@@ -143,12 +145,10 @@ function SocialIcon({ href, type }: Social) {
         rel="noopener noreferrer"
         aria-label={type}
         className={[
-          "grid h-10 w-10 place-items-center rounded bg-green-800 text-white transition-colors",
+          "group grid h-10 w-10 place-items-center rounded bg-green-800 text-white transition-colors", // added 'group'
           "hover:bg-green-700 active:bg-green-900",
           "dark:bg-green-700 dark:hover:bg-green-600 dark:active:bg-green-800",
-          // inner glossy highlight
           "relative overflow-hidden",
-          // focus ring
           "focus:outline-none focus-visible:ring-2 focus-visible:ring-green-700 dark:focus-visible:ring-green-400",
         ].join(" ")}
       >
