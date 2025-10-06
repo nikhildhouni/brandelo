@@ -24,3 +24,43 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* subtle floating for background blobs */
+.animate-slow-float { animation: float 8s ease-in-out infinite; }
+.animate-slower-float { animation: float 12s ease-in-out infinite; }
+@keyframes float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-12px) } }
+
+/* animated hue rotation for border glow */
+.animate-hue { animation: hue 12s linear infinite; }
+@keyframes hue { from { filter: hue-rotate(0deg) } to { filter: hue-rotate(360deg) } }
+
+/* link style with 3D lift + underline grow */
+.link-3d {
+  @apply relative text-[15px] font-medium text-gray-700 transition-transform duration-200 will-change-transform;
+}
+.link-3d::after {
+  content: "";
+  @apply absolute left-0 -bottom-2 h-[2px] w-0 rounded-full bg-emerald-600 transition-all duration-300;
+}
+.link-3d:hover { transform: translateZ(20px) translateY(-1px); }
+.link-3d:hover::after { @apply w-full; }
+.link-3d-active { @apply text-emerald-700; }
+.link-3d-active::after { @apply w-full; }
+
+/* glossy CTA with moving sheen */
+.cta-sheen {
+  @apply relative inline-flex items-center justify-center rounded-full px-5 py-2 text-sm font-semibold text-white;
+  @apply bg-gradient-to-r from-emerald-600 via-sky-600 to-fuchsia-600 shadow-lg;
+  @apply ring-1 ring-black/10 transition-transform hover:-translate-y-0.5 active:translate-y-0;
+}
+.cta-sheen::before {
+  content: "";
+  position: absolute; inset: -1px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, rgba(255,255,255,.35), rgba(255,255,255,0) 30%, rgba(255,255,255,.35));
+  background-size: 200% 100%;
+  animation: sheen 3s linear infinite;
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+}
+@keyframes sheen { 0% { background-position-x: 200% } 100% { background-position-x: -200% } }
