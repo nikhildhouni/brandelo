@@ -1,5 +1,5 @@
 // app/api/rates/route.ts
-export const revalidate = 60 * 60 * 12; // 12 hours (ISR/Route Cache)
+export const revalidate = 43200; // 12 hours ✅
 
 export async function GET() {
   try {
