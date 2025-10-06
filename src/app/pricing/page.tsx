@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { Check, ArrowRight, Info } from "lucide-react";
 
 /**
@@ -113,8 +113,17 @@ function formatCurrency(amount: number, currency: string, locale: string) {
   }
 }
 
-/* ======= Animations ======= */
-const fadeUp = { hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } };
+/* ======= Animations (FM v11: use tuple easing, not strings) ======= */
+const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
+
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: EASE_OUT },
+  },
+};
 
 /* ======= Page ======= */
 export default function PricingPageWDB() {
@@ -149,17 +158,30 @@ export default function PricingPageWDB() {
     <main className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
       {/* Background */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8 }}
-          className="absolute -top-40 -left-32 h-[36rem] w-[36rem] rounded-full bg-gradient-to-br from-emerald-400/25 via-sky-400/20 to-fuchsia-400/20 blur-3xl" />
-        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.15 }}
-          className="absolute -bottom-48 -right-40 h-[40rem] w-[40rem] rounded-full bg-gradient-to-tr from-amber-300/20 via-rose-300/20 to-indigo-300/25 blur-3xl" />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: EASE_OUT }}
+          className="absolute -top-40 -left-32 h-[36rem] w-[36rem] rounded-full bg-gradient-to-br from-emerald-400/25 via-sky-400/20 to-fuchsia-400/20 blur-3xl"
+        />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.15, ease: EASE_OUT }}
+          className="absolute -bottom-48 -right-40 h-[40rem] w-[40rem] rounded-full bg-gradient-to-tr from-amber-300/20 via-rose-300/20 to-indigo-300/25 blur-3xl"
+        />
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/10" />
       </div>
 
       {/* Note only (no toggle) */}
-      <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.4 }}
-        className="mb-8 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+      <motion.div
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.4 }}
+        className="mb-8 flex items-center justify-center gap-2 text-sm text-muted-foreground"
+      >
         <Info className="h-4 w-4" />
         <span>Prices auto-convert from INR (cached ~12h)</span>
       </motion.div>
@@ -170,8 +192,12 @@ export default function PricingPageWDB() {
           {CATEGORIES.map((cat) => {
             const isActive = active === cat.key;
             return (
-              <button key={cat.key}
-                onClick={() => { setActive(cat.key); document.getElementById(cat.key)?.scrollIntoView({ behavior: "smooth", block: "start" }); }}
+              <button
+                key={cat.key}
+                onClick={() => {
+                  setActive(cat.key);
+                  document.getElementById(cat.key)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
@@ -189,7 +215,12 @@ export default function PricingPageWDB() {
                   <motion.span
                     layoutId="chip-underline"
                     className="absolute inset-0 rounded-full ring-2 ring-emerald-400/60"
-                    transition={{ type: useReducedMotion() ? "tween" : "spring", stiffness: 300, damping: 25, duration: 0.25 }}
+                    transition={{
+                      type: useReducedMotion() ? "tween" as const : "spring",
+                      stiffness: 300,
+                      damping: 25,
+                      duration: 0.25,
+                    }}
                   />
                 )}
               </button>
@@ -202,7 +233,13 @@ export default function PricingPageWDB() {
       <div className="space-y-20">
         {sections.map((section, sIdx) => (
           <section id={section.key} key={section.key} className="scroll-mt-24">
-            <motion.header variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.4 }} className="mb-8 text-center">
+            <motion.header
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, amount: 0.4 }}
+              className="mb-8 text-center"
+            >
               <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">{section.label}</h2>
               <p className="mt-2 text-sm text-muted-foreground">Select a plan that matches your goals & budget.</p>
             </motion.header>
@@ -224,13 +261,21 @@ export default function PricingPageWDB() {
       </div>
 
       {/* Footer CTA */}
-      <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.4 }}
-        className="mt-24 rounded-2xl border border-white/15 bg-white/10 p-6 text-center backdrop-blur-md shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
+      <motion.div
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.4 }}
+        className="mt-24 rounded-2xl border border-white/15 bg-white/10 p-6 text-center backdrop-blur-md shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]"
+      >
         <h3 className="text-xl font-semibold">Need a custom plan?</h3>
         <p className="mx-auto mt-2 max-w-2xl text-sm text-muted-foreground">
           Tell us your goals and baseline. We'll tailor a package across SEO, content, ads, and web so you only pay for what you need.
         </p>
-        <a href="/contact" className="mt-4 inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/10 px-5 py-2 text-sm font-medium backdrop-blur-md transition hover:shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60">
+        <a
+          href="/contact"
+          className="mt-4 inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/10 px-5 py-2 text-sm font-medium backdrop-blur-md transition hover:shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60"
+        >
           Talk to an expert
           <ArrowRight className="ml-2 h-4 w-4" />
         </a>
@@ -272,8 +317,12 @@ function GlassCard({
       style={{ backgroundImage: "radial-gradient(1200px 400px at 50% -10%, rgba(16,185,129,0.08), transparent 60%)" }}
     >
       {tier.badge && (
-        <motion.span initial={{ opacity: 0, y: -6 }} whileInView={{ opacity: 1, y: 0, transition: { delay: 0.15 } }} viewport={{ once: true }}
-          className="absolute right-4 top-4 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 px-3 py-1 text-[10px] font-medium uppercase tracking-wide text-emerald-50 shadow">
+        <motion.span
+          initial={{ opacity: 0, y: -6 }}
+          whileInView={{ opacity: 1, y: 0, transition: { delay: 0.15, ease: EASE_OUT } }}
+          viewport={{ once: true }}
+          className="absolute right-4 top-4 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 px-3 py-1 text-[10px] font-medium uppercase tracking-wide text-emerald-50 shadow"
+        >
           {tier.badge}
         </motion.span>
       )}
@@ -308,11 +357,15 @@ function GlassCard({
         <p className="mt-3 text-center text-xs text-muted-foreground">No hidden fees or surprises</p>
       </div>
 
-      <div aria-hidden className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition group-hover:opacity-100"
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition group-hover:opacity-100"
         style={{
           background: "linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.06) 20%, rgba(255,255,255,0.0) 40%)",
-          WebkitMask: "radial-gradient(26px 26px at 24px 24px, black 40%, transparent 41%), radial-gradient(26px 26px at calc(100% - 24px) calc(100% - 24px), black 40%, transparent 41%)",
-          mask: "radial-gradient(26px 26px at 24px 24px, black 40%, transparent 41%), radial-gradient(26px 26px at calc(100% - 24px) calc(100% - 24px), black 40%, transparent 41%)",
+          WebkitMask:
+            "radial-gradient(26px 26px at 24px 24px, black 40%, transparent 41%), radial-gradient(26px 26px at calc(100% - 24px) calc(100% - 24px), black 40%, transparent 41%)",
+          mask:
+            "radial-gradient(26px 26px at 24px 24px, black 40%, transparent 41%), radial-gradient(26px 26px at calc(100% - 24px) calc(100% - 24px), black 40%, transparent 41%)",
         }}
       />
     </motion.article>

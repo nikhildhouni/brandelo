@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useMotionTemplate, useSpring } from "framer-motion";
-import { useRef, useState } from "react";
+import { useRef, useState, type MouseEvent } from "react";
 import {
   Mail,
   Phone,
@@ -15,10 +15,13 @@ import {
   Sparkles,
 } from "lucide-react";
 
+/** Framer Motion v11 wants tuple easings, not strings */
+const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
+
 const fx = (delay = 0) => ({
   initial: { opacity: 0, y: 18 },
   whileInView: { opacity: 1, y: 0 },
-  transition: { duration: 0.55, ease: "easeOut", delay },
+  transition: { duration: 0.55, ease: EASE_OUT, delay },
   viewport: { once: true, amount: 0.25 },
 });
 
@@ -27,13 +30,15 @@ function useCardGlow() {
   const mx = useSpring(0, { stiffness: 200, damping: 30 });
   const my = useSpring(0, { stiffness: 200, damping: 30 });
   const maskImage = useMotionTemplate`radial-gradient(260px 260px at ${mx}px ${my}px, rgba(255,255,255,.2), transparent 60%)`;
-  const handleMouseMove = (e: React.MouseEvent) => {
+
+  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     const el = ref.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
     mx.set(e.clientX - rect.left);
     my.set(e.clientY - rect.top);
   };
+
   return { ref, maskImage, handleMouseMove };
 }
 
@@ -53,7 +58,7 @@ export default function ContactPage() {
 
   return (
     <main className="text-gray-900 dark:text-gray-100">
-      {/* ---------- HEADER (UNCHANGED) ---------- */}
+      {/* ---------- HEADER ---------- */}
       <section className="relative grid place-items-center h-[90vh] overflow-hidden">
         <div className="absolute inset-0 -z-10 [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]">
           <div className="absolute inset-0 blur-2xl opacity-90 bg-[conic-gradient(from_0deg_at_50%_50%,rgba(16,185,129,.25),rgba(14,165,233,.25),rgba(217,70,239,.25),rgba(16,185,129,.25))]" />
@@ -62,7 +67,7 @@ export default function ContactPage() {
         <motion.h1
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
+          transition={{ duration: 0.7, ease: EASE_OUT }}
           className="text-5xl md:text-7xl font-extrabold tracking-tight text-center"
         >
           Get in{" "}
@@ -70,6 +75,7 @@ export default function ContactPage() {
             Touch
           </span>
         </motion.h1>
+
         <motion.p
           {...fx(0.12)}
           className="mt-5 max-w-2xl text-center text-lg md:text-xl text-gray-700 dark:text-gray-300"
@@ -113,7 +119,7 @@ export default function ContactPage() {
       {/* ---------- MAIN GRID: STICKY FORM + INFO ---------- */}
       <section className="max-w-6xl mx-auto px-6 pb-24">
         <div className="grid gap-10 lg:grid-cols-[1.1fr,0.9fr] items-start relative isolate">
-          {/* Sticky Lead Form (raised z-index) */}
+          {/* Sticky Lead Form */}
           <motion.div
             ref={ref}
             onMouseMove={handleMouseMove}
@@ -247,6 +253,7 @@ export default function ContactPage() {
                     <motion.div
                       initial={{ opacity: 0, y: -6 }}
                       animate={{ opacity: 1, y: 0 }}
+                      transition={{ ease: EASE_OUT, duration: 0.3 }}
                       className="flex items-center gap-2 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 px-4 py-3 text-emerald-700 dark:text-emerald-300"
                     >
                       <CheckCircle size={18} />
@@ -258,7 +265,7 @@ export default function ContactPage() {
             </div>
           </motion.div>
 
-          {/* Right column (kept below the sticky form) */}
+          {/* Right column */}
           <div className="space-y-8 relative z-10">
             {/* Social proof / badges */}
             <motion.div
@@ -331,6 +338,7 @@ export default function ContactPage() {
                 initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.4 }}
+                transition={{ ease: EASE_OUT, duration: 0.4, delay: 0.1 }}
                 className="absolute left-6 bottom-6 right-6 md:left-8 md:bottom-8 md:right-auto"
               >
                 <div className="max-w-md rounded-2xl bg-white/90 dark:bg-gray-900/80 backdrop-blur ring-1 ring-gray-200/70 dark:ring-gray-800/70 p-4 md:p-5">

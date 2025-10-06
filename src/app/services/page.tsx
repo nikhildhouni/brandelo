@@ -3,7 +3,7 @@
 import { motion, useMotionTemplate, useSpring } from "framer-motion";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
-import { useRef } from "react";
+import { useRef, type MouseEvent } from "react";
 import type { CSSProperties } from "react";
 
 type Service = {
@@ -44,10 +44,13 @@ const SERVICES: Service[] = [
   },
 ];
 
+/** Framer Motion v11 uses tuple easings (not strings) */
+const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
+
 const fx = (delay = 0) => ({
   initial: { opacity: 0, y: 18 },
   whileInView: { opacity: 1, y: 0 },
-  transition: { duration: 0.55, ease: "easeOut", delay },
+  transition: { duration: 0.55, ease: EASE_OUT, delay },
   viewport: { once: true, amount: 0.25 },
 });
 
@@ -58,7 +61,7 @@ function useCardGlow() {
   const my = useSpring(0, { stiffness: 200, damping: 30 });
 
   const maskImage = useMotionTemplate`radial-gradient(240px 240px at ${mx}px ${my}px, rgba(255,255,255,.18), transparent 60%)`;
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     const el = ref.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
@@ -76,7 +79,6 @@ function ServiceRow({ s, i }: { s: Service; i: number }) {
 
   return (
     <motion.div
-      key={s.title}
       {...fx(i * 0.06)}
       className={`relative grid gap-10 items-center lg:grid-cols-2 ${
         isOdd ? "lg:[&>*:first-child]:order-2" : ""
@@ -143,7 +145,6 @@ function ServiceRow({ s, i }: { s: Service; i: number }) {
         className="relative rounded-2xl"
       >
         {/* glow follows cursor */}
-        {/* Use motion.div so MotionValue style is fully typed */}
         <motion.div
           aria-hidden
           className="pointer-events-none absolute inset-0 -z-10 rounded-2xl"
@@ -159,7 +160,7 @@ function ServiceRow({ s, i }: { s: Service; i: number }) {
           <motion.div
             initial={{ scale: 1.02 }}
             whileInView={{ scale: 1 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
+            transition={{ duration: 0.6, ease: EASE_OUT }}
             className="relative aspect-[4/3] overflow-hidden rounded-xl"
           >
             <motion.div
@@ -182,7 +183,7 @@ function ServiceRow({ s, i }: { s: Service; i: number }) {
             <motion.span
               initial={{ opacity: 0, y: -6 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15, duration: 0.5 }}
+              transition={{ delay: 0.15, duration: 0.5, ease: EASE_OUT }}
               className="absolute left-3 top-3 rounded-full bg-black/70 px-3 py-1 text-xs font-medium text-white shadow-md dark:bg-white/10 backdrop-blur"
             >
               {s.title}
@@ -222,7 +223,7 @@ export default function ServicesPage() {
         <motion.h1
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
+          transition={{ duration: 0.7, ease: EASE_OUT }}
           className="text-5xl md:text-7xl font-extrabold tracking-tight text-center"
         >
           Our{" "}
@@ -260,7 +261,7 @@ export default function ServicesPage() {
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
+            transition={{ duration: 0.6, ease: EASE_OUT }}
             className="relative overflow-hidden rounded-3xl p-[1px]"
             style={{
               background:

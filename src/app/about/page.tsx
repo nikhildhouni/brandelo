@@ -22,11 +22,15 @@ const LOGOS = [
   "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=800&auto=format&fit=crop",
 ];
 
+/** ---------- Easings (FM v11 wants tuples, not strings) ---------- */
+const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
+const LINEAR: [number, number, number, number] = [0, 0, 1, 1];
+
 /** ---------- Helpers ---------- */
 const fx = (delay = 0, y = 20) => ({
   initial: { opacity: 0, y },
   whileInView: { opacity: 1, y: 0 },
-  transition: { duration: 0.5, ease: "easeOut", delay },
+  transition: { duration: 0.5, ease: EASE_OUT, delay },
   viewport: { once: true, amount: 0.25 },
 });
 
@@ -48,7 +52,9 @@ export default function AboutUs() {
 
   return (
     <main className="relative w-full text-gray-900 dark:text-gray-100 selection:bg-blue-500/20 overflow-hidden">
-      {/* Thin progress bar */}
+      {/* Thin progress bar (optional use somewhere if you want) */}
+      {/* <motion.div style={{ scaleX: bar }} className="fixed left-0 right-0 top-0 h-[3px] origin-left bg-gradient-to-r from-blue-500 via-fuchsia-500 to-cyan-400 z-50" /> */}
+
       {/* ===== HERO (clean, image-free) ===== */}
       <section
         ref={heroRef}
@@ -69,7 +75,7 @@ export default function AboutUs() {
         <motion.h1
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
+          transition={{ duration: 0.7, ease: EASE_OUT }}
           className="text-5xl md:text-7xl font-extrabold tracking-tight"
         >
           About{" "}
@@ -81,7 +87,7 @@ export default function AboutUs() {
         <motion.p
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15, duration: 0.6 }}
+          transition={{ delay: 0.15, duration: 0.6, ease: EASE_OUT }}
           className="mt-5 text-lg md:text-xl max-w-2xl text-gray-700 dark:text-gray-300"
         >
           We help brands grow with creativity, strategy, and innovation—powering performance with data & design.
@@ -98,7 +104,7 @@ export default function AboutUs() {
               key={i}
               initial={prefersReduced ? { opacity: 0 } : { opacity: 0, y: 8, scale: 0.96 }}
               animate={prefersReduced ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
-              transition={{ delay: 0.25 + i * 0.07, duration: 0.4 }}
+              transition={{ delay: 0.25 + i * 0.07, duration: 0.4, ease: EASE_OUT }}
               className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm bg-white/70 dark:bg-gray-900/60 ring-1 ring-gray-200/70 dark:ring-gray-700/70 backdrop-blur"
             >
               {b.icon}
@@ -121,7 +127,7 @@ export default function AboutUs() {
             <motion.div
               className="flex gap-10 items-center"
               animate={{ x: ["0%", "-50%"] }}
-              transition={{ duration: 18, ease: "linear", repeat: Infinity }}
+              transition={{ duration: 18, ease: LINEAR, repeat: Infinity }}
             >
               {[...LOGOS, ...LOGOS].map((src, i) => (
                 <div key={i} className="relative h-10 w-44 grayscale opacity-80">
@@ -141,24 +147,24 @@ export default function AboutUs() {
             Our Journey
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {yearCards.map((item, idx) => (
-              <motion.article
-                key={idx}
-                {...fx(idx * 0.05)}
-                className="group relative overflow-hidden rounded-2xl bg-white/80 dark:bg-gray-800/80 ring-1 ring-gray-200/70 dark:ring-gray-700/70"
-              >
-                <div className="relative p-6">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-2xl font-semibold">{item.year}</h3>
-                    <span className="text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-700">Milestone {idx + 1}</span>
-                  </div>
-                  <p className="mt-2 text-gray-600 dark:text-gray-400">{item.text}</p>
-                  <div className="mt-6 h-1 w-0 bg-gradient-to-r from-blue-500 via-fuchsia-500 to-cyan-400 transition-all duration-300 group-hover:w-24" />
+        <div className="grid md:grid-cols-3 gap-8">
+          {yearCards.map((item, idx) => (
+            <motion.article
+              key={idx}
+              {...fx(idx * 0.05)}
+              className="group relative overflow-hidden rounded-2xl bg-white/80 dark:bg-gray-800/80 ring-1 ring-gray-200/70 dark:ring-gray-700/70"
+            >
+              <div className="relative p-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-2xl font-semibold">{item.year}</h3>
+                  <span className="text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-700">Milestone {idx + 1}</span>
                 </div>
-              </motion.article>
-            ))}
-          </div>
+                <p className="mt-2 text-gray-600 dark:text-gray-400">{item.text}</p>
+                <div className="mt-6 h-1 w-0 bg-gradient-to-r from-blue-500 via-fuchsia-500 to-cyan-400 transition-all duration-300 group-hover:w-24" />
+              </div>
+            </motion.article>
+          ))}
+        </div>
         </div>
       </section>
 
@@ -253,10 +259,10 @@ export default function AboutUs() {
       </section>
 
       {/* ===== TESTIMONIALS ===== */}
-<Testimonials/>
+      <Testimonials />
 
       {/* ===== FAQ ===== */}
-<FAQSectionWDB/>
+      <FAQSectionWDB />
 
       {/* ===== CTA ===== */}
       <section className="py-20 text-center relative">
