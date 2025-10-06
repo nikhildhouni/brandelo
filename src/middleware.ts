@@ -23,7 +23,7 @@ function currencyFromAcceptLanguage(acceptLang?: string | null): string {
 
 export function middleware(req: NextRequest) {
   const res = NextResponse.next();
-  const country = req.geo?.country; // Vercel prod pe aata hai; local me mostly undefined
+  const country = req.headers.get("x-vercel-ip-country") || undefined; // Vercel prod pe aata hai; local me mostly undefined
 
   // Always (re)set cookie on every navigation to avoid stale values across browsers/sessions
   const currency = country ? (MAP[country] || "INR") : currencyFromAcceptLanguage(req.headers.get("accept-language"));
