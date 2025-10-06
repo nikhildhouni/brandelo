@@ -1,9 +1,10 @@
 "use client";
 
-import { motion, useMotionTemplate, useSpring, useTransform } from "framer-motion";
+import { motion, useMotionTemplate, useSpring } from "framer-motion";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { useRef } from "react";
+import type { CSSProperties } from "react";
 
 type Service = {
   title: string;
@@ -68,6 +69,146 @@ function useCardGlow() {
   return { ref, maskImage, handleMouseMove };
 }
 
+// Child row component (so hooks are not inside a loop)
+function ServiceRow({ s, i }: { s: Service; i: number }) {
+  const { ref, maskImage, handleMouseMove } = useCardGlow();
+  const isOdd = i % 2 === 1;
+
+  return (
+    <motion.div
+      key={s.title}
+      {...fx(i * 0.06)}
+      className={`relative grid gap-10 items-center lg:grid-cols-2 ${
+        isOdd ? "lg:[&>*:first-child]:order-2" : ""
+      }`}
+    >
+      {/* Text card */}
+      <motion.div
+        whileHover={{ y: -4 }}
+        transition={{ type: "spring", stiffness: 200, damping: 20 }}
+        className="group relative rounded-2xl p-1"
+      >
+        {/* conic edge */}
+        <div
+          className="absolute inset-0 -z-10 rounded-2xl opacity-70 blur-sm"
+          style={{
+            background:
+              "conic-gradient(from 140deg at 50% 50%, rgba(16,185,129,.35), rgba(14,165,233,.35), rgba(217,70,239,.35), rgba(16,185,129,.35))",
+          }}
+        />
+        <div className="relative rounded-2xl bg-white/70 dark:bg-gray-900/60 ring-1 ring-gray-200/70 dark:ring-gray-800/70 backdrop-blur-xl">
+          <div className="p-7 md:p-9">
+            <h2 className="text-4xl md:text-5xl font-extrabold leading-tight tracking-tight">
+              <span className="bg-gradient-to-r from-emerald-500 via-sky-500 to-fuchsia-500 bg-clip-text text-transparent">
+                {s.title}
+              </span>
+            </h2>
+
+            <div className="mt-3">
+              <h3 className="text-base md:text-lg font-semibold text-gray-800 dark:text-gray-200">
+                {s.subtitle}
+              </h3>
+              <p className="mt-3 max-w-xl leading-relaxed text-gray-600 dark:text-gray-400">
+                {s.blurb}
+              </p>
+            </div>
+
+            <div className="mt-7 flex items-center gap-4">
+              {/* skinny switch-like outline */}
+              <span className="inline-block h-10 w-28 rounded-full border border-gray-300/70 dark:border-gray-700/70" />
+              <motion.a
+                href="/contact"
+                whileHover={{ x: 3 }}
+                whileTap={{ scale: 0.97 }}
+                className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-6 py-2.5 font-semibold text-white shadow hover:bg-emerald-700 transition"
+              >
+                Explore <ArrowRight size={16} />
+              </motion.a>
+            </div>
+
+            <p className="mt-6 text-sm text-gray-600 dark:text-gray-400">
+              we don’t have market- we create <br /> digital success stories
+            </p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Visual card with interactive glow + subtle tilt */}
+      <motion.div
+        ref={ref}
+        onMouseMove={handleMouseMove}
+        whileHover={{ rotateX: isOdd ? -2 : 2, rotateY: isOdd ? 2 : -2, y: -6 }}
+        style={{ transformStyle: "preserve-3d" as CSSProperties["transformStyle"] }}
+        transition={{ type: "spring", stiffness: 200, damping: 18 }}
+        className="relative rounded-2xl"
+      >
+        {/* glow follows cursor */}
+        {/* Use motion.div so MotionValue style is fully typed */}
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 -z-10 rounded-2xl"
+          style={{
+            WebkitMaskImage: maskImage,
+            maskImage: maskImage,
+            background:
+              "linear-gradient(90deg, rgba(16,185,129,.35), rgba(14,165,233,.35), rgba(217,70,239,.35))",
+          }}
+        />
+        {/* frame */}
+        <div className="relative rounded-2xl bg-white/60 dark:bg-gray-900/50 p-2 ring-1 ring-gray-200/70 dark:ring-gray-800/70 backdrop-blur">
+          <motion.div
+            initial={{ scale: 1.02 }}
+            whileInView={{ scale: 1 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="relative aspect-[4/3] overflow-hidden rounded-xl"
+          >
+            <motion.div
+              initial={{ scale: 1.05 }}
+              whileHover={{ scale: 1.08 }}
+              transition={{ type: "spring", stiffness: 120, damping: 16 }}
+              className="absolute inset-0"
+            >
+              <Image
+                src={s.img}
+                alt={s.title}
+                fill
+                className="object-cover"
+                unoptimized
+                priority={i < 2}
+              />
+            </motion.div>
+
+            {/* corner badge */}
+            <motion.span
+              initial={{ opacity: 0, y: -6 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15, duration: 0.5 }}
+              className="absolute left-3 top-3 rounded-full bg-black/70 px-3 py-1 text-xs font-medium text-white shadow-md dark:bg-white/10 backdrop-blur"
+            >
+              {s.title}
+            </motion.span>
+          </motion.div>
+        </div>
+
+        {/* playful doodle */}
+        <svg
+          aria-hidden
+          className="absolute -top-6 -right-4 h-16 w-16 text-gray-300 dark:text-gray-700"
+          viewBox="0 0 64 64"
+          fill="none"
+        >
+          <path
+            d="M6 50C12 34 20 14 34 12c14-2 19 16 6 22S18 52 6 50Z"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+        </svg>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 export default function ServicesPage() {
   return (
     <main className="text-gray-900 dark:text-gray-100">
@@ -99,145 +240,21 @@ export default function ServicesPage() {
 
       {/* ---------- MODERN SERVICES (updated) ---------- */}
       <section className="max-w-6xl mx-auto px-6 pb-28 space-y-16">
-        {SERVICES.map((s, i) => {
-          const { ref, maskImage, handleMouseMove } = useCardGlow();
-          const isOdd = i % 2 === 1;
-
-          return (
-            <motion.div
-              key={s.title}
-              {...fx(i * 0.06)}
-              className={`relative grid gap-10 items-center lg:grid-cols-2 ${
-                isOdd ? "lg:[&>*:first-child]:order-2" : ""
-              }`}
-            >
-              {/* Text card */}
-              <motion.div
-                whileHover={{ y: -4 }}
-                transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                className="group relative rounded-2xl p-1"
-              >
-                {/* conic edge */}
-                <div
-                  className="absolute inset-0 -z-10 rounded-2xl opacity-70 blur-sm"
-                  style={{
-                    background:
-                      "conic-gradient(from 140deg at 50% 50%, rgba(16,185,129,.35), rgba(14,165,233,.35), rgba(217,70,239,.35), rgba(16,185,129,.35))",
-                  }}
-                />
-                <div className="relative rounded-2xl bg-white/70 dark:bg-gray-900/60 ring-1 ring-gray-200/70 dark:ring-gray-800/70 backdrop-blur-xl">
-                  <div className="p-7 md:p-9">
-                    <h2 className="text-4xl md:text-5xl font-extrabold leading-tight tracking-tight">
-                      <span className="bg-gradient-to-r from-emerald-500 via-sky-500 to-fuchsia-500 bg-clip-text text-transparent">
-                        {s.title}
-                      </span>
-                    </h2>
-
-                    <div className="mt-3">
-                      <h3 className="text-base md:text-lg font-semibold text-gray-800 dark:text-gray-200">
-                        {s.subtitle}
-                      </h3>
-                      <p className="mt-3 max-w-xl leading-relaxed text-gray-600 dark:text-gray-400">
-                        {s.blurb}
-                      </p>
-                    </div>
-
-                    <div className="mt-7 flex items-center gap-4">
-                      {/* skinny switch-like outline */}
-                      <span className="inline-block h-10 w-28 rounded-full border border-gray-300/70 dark:border-gray-700/70" />
-                      <motion.a
-                        href="/contact"
-                        whileHover={{ x: 3 }}
-                        whileTap={{ scale: 0.97 }}
-                        className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-6 py-2.5 font-semibold text-white shadow hover:bg-emerald-700 transition"
-                      >
-                        Explore <ArrowRight size={16} />
-                      </motion.a>
-                    </div>
-
-                    <p className="mt-6 text-sm text-gray-600 dark:text-gray-400">
-                      we don’t have market- we create <br /> digital success stories
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Visual card with interactive glow + subtle tilt */}
-              <motion.div
-                ref={ref}
-                onMouseMove={handleMouseMove}
-                whileHover={{ rotateX: isOdd ? -2 : 2, rotateY: isOdd ? 2 : -2, y: -6 }}
-                style={{ transformStyle: "preserve-3d" as any }}
-                transition={{ type: "spring", stiffness: 200, damping: 18 }}
-                className="relative rounded-2xl"
-              >
-                {/* glow follows cursor */}
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0 -z-10 rounded-2xl"
-                  style={{ WebkitMaskImage: maskImage as any, maskImage: maskImage as any, background: "linear-gradient(90deg, rgba(16,185,129,.35), rgba(14,165,233,.35), rgba(217,70,239,.35))" }}
-                />
-                {/* frame */}
-                <div className="relative rounded-2xl bg-white/60 dark:bg-gray-900/50 p-2 ring-1 ring-gray-200/70 dark:ring-gray-800/70 backdrop-blur">
-                  <motion.div
-                    initial={{ scale: 1.02 }}
-                    whileInView={{ scale: 1 }}
-                    transition={{ duration: 0.6, ease: "easeOut" }}
-                    className="relative aspect-[4/3] overflow-hidden rounded-xl"
-                  >
-                    <motion.div
-                      initial={{ scale: 1.05 }}
-                      whileHover={{ scale: 1.08 }}
-                      transition={{ type: "spring", stiffness: 120, damping: 16 }}
-                      className="absolute inset-0"
-                    >
-                      <Image
-                        src={s.img}
-                        alt={s.title}
-                        fill
-                        className="object-cover"
-                        unoptimized
-                        priority={i < 2}
-                      />
-                    </motion.div>
-
-                    {/* corner badge */}
-                    <motion.span
-                      initial={{ opacity: 0, y: -6 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.15, duration: 0.5 }}
-                      className="absolute left-3 top-3 rounded-full bg-black/70 px-3 py-1 text-xs font-medium text-white shadow-md dark:bg-white/10 backdrop-blur"
-                    >
-                      {s.title}
-                    </motion.span>
-                  </motion.div>
-                </div>
-
-                {/* playful doodle */}
-                <svg
-                  aria-hidden
-                  className="absolute -top-6 -right-4 h-16 w-16 text-gray-300 dark:text-gray-700"
-                  viewBox="0 0 64 64"
-                  fill="none"
-                >
-                  <path
-                    d="M6 50C12 34 20 14 34 12c14-2 19 16 6 22S18 52 6 50Z"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </motion.div>
-            </motion.div>
-          );
-        })}
+        {SERVICES.map((s, i) => (
+          <ServiceRow key={s.title} s={s} i={i} />
+        ))}
       </section>
 
       {/* ---------- Classy CTA (updated) ---------- */}
       <section className="relative py-20">
         {/* soft background glow */}
-        <div className="pointer-events-none absolute inset-0 -z-10 mx-auto max-w-5xl blur-3xl opacity-40"
-             style={{ background: "radial-gradient(500px 200px at 50% 50%, rgba(16,185,129,.25), transparent 60%)" }} />
+        <div
+          className="pointer-events-none absolute inset-0 -z-10 mx-auto max-w-5xl blur-3xl opacity-40"
+          style={{
+            background:
+              "radial-gradient(500px 200px at 50% 50%, rgba(16,185,129,.25), transparent 60%)",
+          }}
+        />
         <div className="max-w-5xl mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
