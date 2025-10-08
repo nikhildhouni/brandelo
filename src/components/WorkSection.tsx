@@ -261,79 +261,145 @@ export default function WorkSection() {
         </motion.div>
       </div>
 
-      {/* Lightbox Modal */}
-      <AnimatePresence>
-        {openItem && (
-          <motion.div className="fixed inset-0 z-50 grid place-items-center p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setOpenId(null)} />
+    {/* Lightbox Modal (responsive + clamped) */}
+<AnimatePresence>
+  {openItem && (
+    <motion.div
+      className="fixed inset-0 z-50 grid place-items-center p-3 sm:p-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      {/* Backdrop */}
+      <button
+        aria-label="Close"
+        onClick={() => setOpenId(null)}
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+      />
 
-            <motion.div
-              role="dialog"
-              aria-modal="true"
-              className="relative w-full max-w-3xl overflow-hidden rounded-3xl border border-white/20 bg-white/90 p-0 shadow-2xl backdrop-blur-xl dark:bg-zinc-900/90"
-              initial={{ y: 30, scale: 0.98, opacity: 0 }}
-              animate={{ y: 0, scale: 1, opacity: 1 }}
-              exit={{ y: 20, scale: 0.98, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 220, damping: 22 }}
+      {/* Dialog */}
+      <motion.div
+        role="dialog"
+        aria-modal="true"
+        className="
+          relative w-full 
+          max-w-[min(92vw,900px)] sm:max-w-3xl 
+          max-h-[90vh] overflow-hidden
+          rounded-3xl border border-white/20 
+          bg-white/90 shadow-2xl backdrop-blur-xl 
+          dark:bg-zinc-900/90
+        "
+        initial={{ y: 30, scale: 0.98, opacity: 0 }}
+        animate={{ y: 0, scale: 1, opacity: 1 }}
+        exit={{ y: 20, scale: 0.98, opacity: 0 }}
+        transition={{ type: "spring", stiffness: 220, damping: 22 }}
+      >
+        {/* Media: fixed, responsive height (avoids overflow) */}
+        <div className="relative w-full h-[40vh] sm:h-[48vh]">
+          {openItem.video ? (
+            <video
+              className="h-full w-full object-cover"
+              src={openItem.video}
+              muted
+              playsInline
+              autoPlay
+              loop
+            />
+          ) : (
+            <img
+              className="h-full w-full object-cover"
+              src={openItem.cover}
+              alt={openItem.title}
+            />
+          )}
+
+          <button
+            onClick={() => setOpenId(null)}
+            className="absolute right-3 top-3 inline-flex items-center justify-center rounded-xl bg-black/70 p-2 text-white shadow-md backdrop-blur hover:bg-black/80"
+            aria-label="Close"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* Scrollable body: will never exceed viewport */}
+        <div className="p-5 sm:p-6 overflow-y-auto max-h-[calc(90vh-40vh)] sm:max-h-[calc(90vh-48vh)]">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
+                {openItem.title}
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-white/70">
+                {openItem.client} • {openItem.category}
+              </p>
+            </div>
+            <a
+              href="#contact"
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-400 to-cyan-400 px-4 py-2 text-sm font-semibold text-black shadow-[0_8px_30px_rgba(56,189,248,.35)] hover:opacity-90"
             >
-              <div className="relative aspect-[16/9]">
-                {openItem.video ? (
-                  <video className="h-full w-full object-cover" src={openItem.video} muted playsInline autoPlay loop />
-                ) : (
-                  <img className="h-full w-full object-cover" src={openItem.cover} alt={openItem.title} />
-                )}
-                <button onClick={() => setOpenId(null)} className="absolute right-3 top-3 inline-flex items-center justify-center rounded-xl bg-black/70 p-2 text-white shadow-md backdrop-blur hover:bg-black/80" aria-label="Close">
-                  <X className="h-5 w-5" />
-                </button>
+              Start a Project <ArrowUpRight className="h-4 w-4" />
+            </a>
+          </div>
+
+          {openItem.blurb && (
+            <p className="mt-3 text-gray-700 dark:text-white/80">
+              {openItem.blurb}
+            </p>
+          )}
+
+          {openItem.metrics && (
+            <ul className="mt-5 grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {openItem.metrics.map((m) => (
+                <li
+                  key={m.label}
+                  className="rounded-xl border border-black/10 bg-white/70 p-3 text-center text-sm text-gray-800 backdrop-blur dark:border-white/20 dark:bg-white/10 dark:text-white/80"
+                >
+                  <div className="text-xs text-gray-500 dark:text-white/60">
+                    {m.label}
+                  </div>
+                  <div className="text-base font-medium">{m.value}</div>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {openItem.tags && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {openItem.tags.map((t) => (
+                <span
+                  key={t}
+                  className="rounded-full border border-black/10 bg-white/60 px-2.5 py-1 text-[11px] text-gray-700 backdrop-blur dark:border-white/20 dark:bg-white/10 dark:text-white/70"
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <div className="rounded-2xl border border-black/10 bg-white/70 p-4 backdrop-blur dark:border-white/20 dark:bg-white/10">
+              <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                Approach
               </div>
-
-              <div className="p-6">
-                <div className="flex flex-wrap items-start justify-between gap-4">
-                  <div>
-                    <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">{openItem.title}</h3>
-                    <p className="text-sm text-gray-600 dark:text-white/70">{openItem.client} • {openItem.category}</p>
-                  </div>
-                  <a href="#contact" className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-400 to-cyan-400 px-4 py-2 text-sm font-semibold text-black shadow-[0_8px_30px_rgba(56,189,248,.35)] hover:opacity-90">
-                    Start a Project <ArrowUpRight className="h-4 w-4" />
-                  </a>
-                </div>
-
-                {openItem.blurb && <p className="mt-3 text-gray-700 dark:text-white/80">{openItem.blurb}</p>}
-
-                {openItem.metrics && (
-                  <ul className="mt-5 grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {openItem.metrics.map((m) => (
-                      <li key={m.label} className="rounded-xl border border-black/10 bg-white/70 p-3 text-center text-sm text-gray-800 backdrop-blur dark:border-white/20 dark:bg-white/10 dark:text-white/80">
-                        <div className="text-xs text-gray-500 dark:text-white/60">{m.label}</div>
-                        <div className="text-base font-medium">{m.value}</div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-
-                {openItem.tags && (
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {openItem.tags.map((t) => (
-                      <span key={t} className="rounded-full border border-black/10 bg-white/60 px-2.5 py-1 text-[11px] text-gray-700 backdrop-blur dark:border-white/20 dark:bg-white/10 dark:text-white/70">{t}</span>
-                    ))}
-                  </div>
-                )}
-
-                <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                  <div className="rounded-2xl border border-black/10 bg-white/70 p-4 backdrop-blur dark:border-white/20 dark:bg-white/10">
-                    <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">Approach</div>
-                    <p className="text-sm text-gray-700 dark:text-white/70">Discovery, insights, and playbook—then rapid experimentation with weekly reviews.</p>
-                  </div>
-                  <div className="rounded-2xl border border-black/10 bg-white/70 p-4 backdrop-blur dark:border-white/20 dark:bg-white/10">
-                    <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">Stack</div>
-                    <p className="text-sm text-gray-700 dark:text-white/70">GA4 / Server‑side events, Next.js, Tailwind, Figma, Ads Manager & Looker.</p>
-                  </div>
-                </div>
+              <p className="text-sm text-gray-700 dark:text-white/70">
+                Discovery, insights, and playbook—then rapid experimentation with weekly reviews.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-black/10 bg-white/70 p-4 backdrop-blur dark:border-white/20 dark:bg-white/10">
+              <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                Stack
               </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              <p className="text-sm text-gray-700 dark:text-white/70">
+                GA4 / Server-side events, Next.js, Tailwind, Figma, Ads Manager & Looker.
+              </p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
+
     </section>
   );
 }

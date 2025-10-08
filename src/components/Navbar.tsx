@@ -58,7 +58,7 @@ export default function Navbar2D() {
                 <Link href="/" className="group flex items-center gap-3">
                   <Logo2D />
                   <span className="text-lg font-semibold tracking-tight text-gray-800 transition-colors group-hover:text-emerald-700 dark:text-gray-100 dark:group-hover:text-emerald-300">
-                    Xyz<span className="text-gray-500 dark:text-gray-300/70"> Agency</span>
+                  Brand<span className="text-gray-500 dark:text-gray-300/70">elo</span>
                   </span>
                 </Link>
 
@@ -128,7 +128,7 @@ function Info({ icon, text, href }: { icon: string; text: string; href?: string 
       {Content}
     </a>
   ) : (
-    Content
+    Content 
   );
 }
 

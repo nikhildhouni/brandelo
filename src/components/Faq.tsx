@@ -15,9 +15,9 @@ type Props = {
 };
 
 export default function FAQSectionWDB({
-  title = "Frequently Asked Question",
-  watermark = "Frequently Asked Question",
-  illustrationSrc = "/images/faq/faq.png", // replace with your asset
+  title = "Frequently Asked Questions",
+  watermark = "FAQs",
+  illustrationSrc = "/images/faq/faq.png",
   faqs = [
     { q: "What is Web Digital Bazaar?", a: "We’re a full-stack digital growth studio offering SEO, SMM, Ads, and dev." },
     { q: "How soon can we start?", a: "Usually within a week after scoping and onboarding." },
@@ -36,29 +36,38 @@ export default function FAQSectionWDB({
     try {
       await onAsk?.(askText.trim());
       setAskText("");
-    } catch {
-      // no-op, keep UX simple
-    }
+    } catch {}
   };
 
   return (
-    <section className="relative overflow-hidden bg-white py-16 dark:bg-[#0b0f0e]">
+    <section className="relative overflow-hidden py-24 bg-gradient-to-b from-white via-white to-gray-50 dark:from-[#0b1020] dark:via-[#0b1020] dark:to-black">
+      {/* Gradient Glow */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute inset-0 bg-[radial-gradient(80%_60%_at_50%_10%,rgba(59,130,246,0.1),transparent_50%),radial-gradient(60%_50%_at_80%_20%,rgba(34,197,94,0.1),transparent_50%)] dark:bg-[radial-gradient(80%_60%_at_50%_10%,rgba(59,130,246,0.18),transparent_50%),radial-gradient(60%_50%_at_80%_20%,rgba(168,85,247,0.18),transparent_50%)]" />
+      </div>
+
       {/* Watermark */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-6 select-none text-center text-[clamp(40px,12vw,80px)] font-extrabold leading-none tracking-tight text-black/5 dark:text-white/5"
+        className="pointer-events-none absolute inset-x-0 top-10 select-none text-center text-[clamp(40px,12vw,80px)] font-extrabold leading-none tracking-tight text-black/5 dark:text-white/5"
       >
         {watermark}
       </div>
 
-      <div className="relative mx-auto grid max-w-6xl grid-cols-1 items-start gap-10 px-6 md:grid-cols-2">
-        {/* Heading */}
-        <h2 className="md:col-span-2 -mt-2 text-center text-2xl font-extrabold tracking-tight text-black drop-shadow-[0_2px_0_rgba(0,0,0,0.25)] dark:text-white dark:drop-shadow-[0_2px_0_rgba(255,255,255,0.08)]">
+      <div className="relative mx-auto grid max-w-6xl grid-cols-1 items-start gap-14 px-6 md:grid-cols-2">
+        {/* Title */}
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="md:col-span-2 text-center text-4xl font-semibold text-gray-900 dark:text-white sm:text-5xl"
+        >
           {title}
-        </h2>
+        </motion.h2>
 
-        {/* Left: Accordion list */}
-        <div className="order-2 md:order-1 space-y-4">
+        {/* Left: FAQs */}
+        <div className="order-2 space-y-4 md:order-1">
           {faqs.map((item, i) => (
             <FAQItem
               key={i}
@@ -70,54 +79,67 @@ export default function FAQSectionWDB({
           ))}
         </div>
 
-        {/* Right: Illustration + Ask form */}
-        <div className="order-1 md:order-2">
-          {/* Illustration */}
+        {/* Right: Illustration + Ask */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          viewport={{ once: true }}
+          className="order-1 md:order-2"
+        >
           <div className="flex justify-center md:justify-end">
-            <Image
-              src={illustrationSrc}
-              alt="FAQ illustration"
-              width={320}
-              height={260}
-              className="h-auto w-[320px] object-contain"
-              priority
-            />
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 200, damping: 15 }}
+              className="relative w-[320px] rounded-[2rem] border border-black/10 bg-white/60 shadow-xl backdrop-blur-xl dark:border-white/15 dark:bg-white/10"
+            >
+              <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-tr from-emerald-400/10 via-cyan-400/10 to-fuchsia-400/10 blur-2xl" />
+              <Image
+                src={illustrationSrc}
+                alt="FAQ illustration"
+                width={320}
+                height={260}
+                className="relative z-10 h-auto w-full rounded-[1.8rem] object-contain"
+                priority
+              />
+            </motion.div>
           </div>
 
-          {/* Ask box */}
-          <div className="mt-4 text-center">
-            <h3 className="text-lg font-semibold text-black dark:text-white">Any Question?</h3>
-            <p className="mt-1 text-sm text-gray-700 dark:text-white/70">
-              You can ask anything you want to know about feedback
+          <div className="mt-8 rounded-2xl border border-black/10 bg-white/70 p-6 text-center shadow-xl backdrop-blur-xl dark:border-white/15 dark:bg-white/10">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              Still have a question?
+            </h3>
+            <p className="mt-1 text-sm text-gray-600 dark:text-white/70">
+              Ask anything — we’ll reply soon!
             </p>
 
             <form
               onSubmit={handleSubmit}
               className="mx-auto mt-4 flex max-w-md flex-col gap-3"
             >
-              <label className="sr-only" htmlFor="ask-input">Let me know</label>
               <input
-                id="ask-input"
                 value={askText}
                 onChange={(e) => setAskText(e.target.value)}
-                placeholder="Enter here"
-                className="rounded-md border border-black/10 bg-white px-3 py-2 text-sm text-black shadow-sm outline-none placeholder:text-gray-400 focus:border-black/30 focus:ring-2 focus:ring-green-800/20 dark:border-white/15 dark:bg-white/5 dark:text-white dark:placeholder:text-white/50 dark:focus:border-white/30"
+                placeholder="Type your question..."
+                className="rounded-xl border border-black/10 bg-white/80 px-3 py-2 text-sm text-gray-900 shadow-sm outline-none placeholder:text-gray-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200 dark:border-white/15 dark:bg-white/10 dark:text-white dark:placeholder:text-white/50"
               />
-              <button
+              <motion.button
                 type="submit"
-                className="mx-auto inline-flex min-w-[120px] items-center justify-center rounded-full bg-[#245433] px-7 py-2 text-sm font-semibold text-white shadow-[0_2px_0_rgba(0,0,0,0.25)] transition-all hover:bg-[#1f4a2d] hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-700"
+                whileTap={{ scale: 0.97 }}
+                whileHover={{ scale: 1.03 }}
+                className="mx-auto inline-flex min-w-[140px] items-center justify-center rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 px-6 py-2 text-sm font-semibold text-black shadow-[0_8px_30px_rgba(56,189,248,.3)] hover:opacity-90"
               >
                 Send
-              </button>
+              </motion.button>
             </form>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
 }
 
-/* ---------- Single FAQ Row ---------- */
+/* ---------- Single FAQ Item ---------- */
 function FAQItem({
   index,
   q,
@@ -134,39 +156,40 @@ function FAQItem({
   return (
     <motion.div
       layout
-      className="group relative overflow-hidden rounded-md bg-white/90 shadow-sm ring-1 ring-black/5 backdrop-blur-sm transition dark:bg-white/5 dark:ring-white/10"
+      className="group relative overflow-hidden rounded-2xl border border-black/10 bg-white/70 shadow-md backdrop-blur-xl transition dark:border-white/15 dark:bg-white/10"
       initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
+      viewport={{ once: true }}
     >
       <button
         onClick={onToggle}
-        className="flex w-full items-center gap-4 px-4 py-4 text-left"
+        className="flex w-full items-center gap-4 px-5 py-4 text-left"
       >
-        {/* Number badge like screenshot */}
-        <div className="grid h-10 w-14 place-items-center rounded-md bg-gray-100 text-sm font-bold text-gray-500 shadow-sm dark:bg-white/10 dark:text-white/60">
+        <div className="grid h-10 w-14 place-items-center rounded-xl border border-black/10 bg-white/60 text-sm font-bold text-gray-500 dark:border-white/15 dark:bg-white/10 dark:text-white/70">
           {String(index + 1).padStart(2, "0")}
         </div>
-
-        <div className="flex-1 text-[15px] font-semibold text-black dark:text-white">
+        <div className="flex-1 text-base font-semibold text-gray-900 dark:text-white">
           {q}
         </div>
-
-        <div className="shrink-0 text-black/70 transition group-hover:scale-110 dark:text-white/80">
+        <motion.div
+          animate={{ rotate: open ? 180 : 0 }}
+          transition={{ duration: 0.25 }}
+          className="text-gray-800 dark:text-white/80"
+        >
           {open ? <Minus className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
-        </div>
+        </motion.div>
       </button>
 
       <AnimatePresence initial={false}>
         {open && (
           <motion.div
-            key="content"
+            key="faq-content"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
+            transition={{ duration: 0.35, ease: "easeOut" }}
           >
-            <div className="px-4 pb-4 pt-0 text-sm leading-relaxed text-gray-700 dark:text-white/75">
+            <div className="px-5 pb-5 text-sm leading-relaxed text-gray-700 dark:text-white/70">
               {a}
             </div>
           </motion.div>

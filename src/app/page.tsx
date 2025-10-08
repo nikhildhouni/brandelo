@@ -1,5 +1,6 @@
 import Faq from "@/components/Faq";
 import Footer from "@/components/Footer";
+import FounderSection from "@/components/FounderSection";
 import Founder from "@/components/Founder";
 import Hero from "@/components/Hero";
 import Hero2 from "@/components/hero2";
@@ -8,6 +9,7 @@ import Services from "@/components/Services";
 import Services2 from "@/components/Services2";
 import Testimonial from "@/components/Testimonial";
 import WorkSection from "@/components/WorkSection";
+import TestimonialSection from "@/components/Testimonial2";
 
 export default function HomePage() {
   return (
@@ -32,8 +34,10 @@ export default function HomePage() {
       {/* <Services/> */}
       {/* <OurWork/> */}
       <WorkSection/>
-      <Testimonial/>
-      <Founder/>
+      {/* <Testimonial/> */}
+      <TestimonialSection/>
+      <FounderSection/>
+      {/* <Founder/> */}
       <Faq/>
     </main>
   );

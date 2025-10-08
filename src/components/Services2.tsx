@@ -1,13 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { Megaphone, PenTool, Cpu } from "lucide-react";
 
 /**
  * ServicesSection.tsx
- * — Three Modern 3D‑Glassy Animated Cards for Services (Marketing, Design, Technology)
+ * — Three Modern 3D-Glassy Animated Cards for Services
  * — Tailwind + Framer Motion + Lucide
- * — Responsive, glassy, hover tilt effect with micro‑interactions
+ * — Added service-specific links (Next.js routing)
  */
 
 const SERVICES = [
@@ -16,18 +17,21 @@ const SERVICES = [
     title: "Marketing",
     desc: "From SEO to Social Media and Paid Ads, we craft growth strategies that attract and convert your target audience.",
     gradient: "from-emerald-400/20 to-cyan-400/20",
+    link: "/services/marketing",
   },
   {
     icon: PenTool,
     title: "Design",
     desc: "Creative storytelling through sleek UI/UX, branding, and content design that amplifies your brand's voice.",
     gradient: "from-fuchsia-400/20 to-indigo-400/20",
+    link: "/services/design",
   },
   {
     icon: Cpu,
     title: "Technology",
     desc: "Web, automation, and analytics solutions built with modern frameworks to empower performance and scalability.",
     gradient: "from-amber-400/20 to-orange-400/20",
+    link: "/services/technology",
   },
 ];
 
@@ -44,6 +48,7 @@ export default function ServicesSection() {
         >
           Our Core Services
         </motion.h2>
+
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -64,6 +69,7 @@ export default function ServicesSection() {
               viewport={{ once: true }}
               transition={{ delay: 0.1 * i, duration: 0.6 }}
             >
+              {/* Hover Gradient Glow */}
               <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${s.gradient} opacity-0 group-hover:opacity-100 blur-2xl transition duration-500`} />
 
               <div className="relative z-10 flex flex-col items-start text-left">
@@ -74,17 +80,17 @@ export default function ServicesSection() {
                 <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
                   {s.title}
                 </h3>
-                <p className="text-gray-700 dark:text-white/70 mb-6">
-                  {s.desc}
-                </p>
 
-                <motion.a
-                  href="#contact"
-                  whileHover={{ x: 4 }}
-                  className="inline-flex items-center gap-2 text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:underline"
-                >
-                  Learn More →
-                </motion.a>
+                <p className="text-gray-700 dark:text-white/70 mb-6">{s.desc}</p>
+
+                <motion.div whileHover={{ x: 4 }}>
+                  <Link
+                    href={s.link}
+                    className="inline-flex items-center gap-2 text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:underline"
+                  >
+                    Learn More →
+                  </Link>
+                </motion.div>
               </div>
             </motion.div>
           ))}
