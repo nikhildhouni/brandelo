@@ -80,7 +80,7 @@ export default function ContactPage() {
           {...fx(0.12)}
           className="mt-5 max-w-2xl text-center text-lg md:text-xl text-gray-700 dark:text-gray-300"
         >
-          Brief bhejo. KPI set karte hain. Results deliver karte hain.
+          Contact Us for tailored digital marketing solutions that drive.
         </motion.p>
       </section>
 

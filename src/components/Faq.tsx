@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import { Plus, Minus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
 
 type FAQ = { q: string; a: string };
 type Props = {
@@ -40,16 +40,36 @@ export default function FAQSectionWDB({
   };
 
   return (
-    <section className="relative overflow-hidden py-24 bg-gradient-to-b from-white via-white to-gray-50 dark:from-[#0b1020] dark:via-[#0b1020] dark:to-black">
-      {/* Gradient Glow */}
+    <section className="relative isolation-isolate overflow-hidden dark bg-[#0b1020] text-white py-24">
+      {/* Background (aurora + grid) */}
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(80%_60%_at_50%_10%,rgba(59,130,246,0.1),transparent_50%),radial-gradient(60%_50%_at_80%_20%,rgba(34,197,94,0.1),transparent_50%)] dark:bg-[radial-gradient(80%_60%_at_50%_10%,rgba(59,130,246,0.18),transparent_50%),radial-gradient(60%_50%_at_80%_20%,rgba(168,85,247,0.18),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(80%_60%_at_50%_10%,rgba(99,102,241,0.25),transparent_50%),radial-gradient(70%_50%_at_80%_20%,rgba(34,197,94,0.20),transparent_50%),#0b1020]" />
+        <div className="absolute inset-0 opacity-40 [mask-image:radial-gradient(70%_60%_at_50%_40%,black,transparent)]">
+          <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="grid-faq" width="32" height="32" patternUnits="userSpaceOnUse">
+                <path d="M 32 0 L 0 0 0 32" fill="none" stroke="white" strokeOpacity="0.06" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid-faq)" />
+          </svg>
+        </div>
+        <motion.div
+          aria-hidden
+          className="absolute -top-40 left-1/2 h-[70rem] w-[70rem] -translate-x-1/2 rounded-full blur-3xl opacity-35"
+          style={{
+            background:
+              "conic-gradient(from 180deg at 50% 50%, rgba(59,130,246,0.35), rgba(168,85,247,0.35), rgba(34,197,94,0.35), rgba(59,130,246,0.35))",
+          }}
+          animate={{ rotate: 360 }}
+          transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
+        />
       </div>
 
       {/* Watermark */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-10 select-none text-center text-[clamp(40px,12vw,80px)] font-extrabold leading-none tracking-tight text-black/5 dark:text-white/5"
+        className="pointer-events-none absolute inset-x-0 top-10 select-none text-center text-[clamp(40px,12vw,80px)] font-extrabold leading-none tracking-tight text-white/5"
       >
         {watermark}
       </div>
@@ -61,7 +81,7 @@ export default function FAQSectionWDB({
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="md:col-span-2 text-center text-4xl font-semibold text-gray-900 dark:text-white sm:text-5xl"
+          className="md:col-span-2 text-center text-4xl font-semibold sm:text-5xl"
         >
           {title}
         </motion.h2>
@@ -91,9 +111,9 @@ export default function FAQSectionWDB({
             <motion.div
               whileHover={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 200, damping: 15 }}
-              className="relative w-[320px] rounded-[2rem] border border-black/10 bg-white/60 shadow-xl backdrop-blur-xl dark:border-white/15 dark:bg-white/10"
+              className="relative w-[320px] rounded-[2rem] border border-white/15 bg-white/10 shadow-2xl backdrop-blur-xl"
             >
-              <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-tr from-emerald-400/10 via-cyan-400/10 to-fuchsia-400/10 blur-2xl" />
+              <div className="absolute inset-0 rounded-[2rem] bg-[conic-gradient(from_0deg,rgba(16,185,129,.25),rgba(59,130,246,.25),rgba(168,85,247,.25),rgba(16,185,129,.25))] opacity-40" />
               <Image
                 src={illustrationSrc}
                 alt="FAQ illustration"
@@ -105,23 +125,16 @@ export default function FAQSectionWDB({
             </motion.div>
           </div>
 
-          <div className="mt-8 rounded-2xl border border-black/10 bg-white/70 p-6 text-center shadow-xl backdrop-blur-xl dark:border-white/15 dark:bg-white/10">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Still have a question?
-            </h3>
-            <p className="mt-1 text-sm text-gray-600 dark:text-white/70">
-              Ask anything — we’ll reply soon!
-            </p>
+          <div className="mt-8 rounded-2xl border border-white/15 bg-white/10 p-6 text-center shadow-2xl backdrop-blur-xl">
+            <h3 className="text-lg font-semibold">Still have a question?</h3>
+            <p className="mt-1 text-sm text-white/70">Ask anything — we’ll reply soon!</p>
 
-            <form
-              onSubmit={handleSubmit}
-              className="mx-auto mt-4 flex max-w-md flex-col gap-3"
-            >
+            <form onSubmit={handleSubmit} className="mx-auto mt-4 flex max-w-md flex-col gap-3">
               <input
                 value={askText}
                 onChange={(e) => setAskText(e.target.value)}
                 placeholder="Type your question..."
-                className="rounded-xl border border-black/10 bg-white/80 px-3 py-2 text-sm text-gray-900 shadow-sm outline-none placeholder:text-gray-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200 dark:border-white/15 dark:bg-white/10 dark:text-white dark:placeholder:text-white/50"
+                className="rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-sm text-white placeholder:text-white/50 outline-none focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-200/30"
               />
               <motion.button
                 type="submit"
@@ -139,7 +152,7 @@ export default function FAQSectionWDB({
   );
 }
 
-/* ---------- Single FAQ Item ---------- */
+/* ---------- Single FAQ Item (always-dark glass) ---------- */
 function FAQItem({
   index,
   q,
@@ -156,26 +169,17 @@ function FAQItem({
   return (
     <motion.div
       layout
-      className="group relative overflow-hidden rounded-2xl border border-black/10 bg-white/70 shadow-md backdrop-blur-xl transition dark:border-white/15 dark:bg-white/10"
+      className="group relative overflow-hidden rounded-2xl border border-white/15 bg-white/10 text-white shadow-2xl backdrop-blur-xl transition"
       initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
     >
-      <button
-        onClick={onToggle}
-        className="flex w-full items-center gap-4 px-5 py-4 text-left"
-      >
-        <div className="grid h-10 w-14 place-items-center rounded-xl border border-black/10 bg-white/60 text-sm font-bold text-gray-500 dark:border-white/15 dark:bg-white/10 dark:text-white/70">
+      <button onClick={onToggle} className="flex w-full items-center gap-4 px-5 py-4 text-left">
+        <div className="grid h-10 w-14 place-items-center rounded-xl border border-white/20 bg-white/10 text-sm font-bold text-white/70">
           {String(index + 1).padStart(2, "0")}
         </div>
-        <div className="flex-1 text-base font-semibold text-gray-900 dark:text-white">
-          {q}
-        </div>
-        <motion.div
-          animate={{ rotate: open ? 180 : 0 }}
-          transition={{ duration: 0.25 }}
-          className="text-gray-800 dark:text-white/80"
-        >
+        <div className="flex-1 text-base font-semibold">{q}</div>
+        <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.25 }} className="text-white/85">
           {open ? <Minus className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
         </motion.div>
       </button>
@@ -189,9 +193,7 @@ function FAQItem({
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.35, ease: "easeOut" }}
           >
-            <div className="px-5 pb-5 text-sm leading-relaxed text-gray-700 dark:text-white/70">
-              {a}
-            </div>
+            <div className="px-5 pb-5 text-sm leading-relaxed text-white/75">{a}</div>
           </motion.div>
         )}
       </AnimatePresence>

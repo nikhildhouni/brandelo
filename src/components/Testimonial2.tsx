@@ -5,12 +5,12 @@ import { motion, AnimatePresence, useMotionTemplate, useMotionValue, useSpring, 
 import { Star, StarHalf, Quote, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 
 /**
- * TestimonialSection.tsx — Glassy, fully animated, modern testimonials
- * - Auto‑play carousel with smooth spring transitions
- * - Drag/swipe support (mouse + touch)
+ * TestimonialSection.tsx — Always-dark neon + glass
+ * - Self-scoped `dark` on the section
+ * - Aurora + grid background (matches hero/services)
+ * - Auto-play carousel with drag/swipe
  * - 3D tilt on hover + cursor sheen
- * - Light/dark mode, accessible
- * No external carousel libs needed.
+ * - Accessible controls/dots
  */
 
 type Testimonial = {
@@ -20,7 +20,7 @@ type Testimonial = {
   company: string;
   avatar: string;
   quote: string;
-  rating?: number; // 0..5, can be decimal .5
+  rating?: number; // 0..5, can be .5
 };
 
 const TESTIMONIALS: Testimonial[] = [
@@ -68,10 +68,7 @@ function useTilt(intensity = 10) {
     mx.set((e.clientX - r.left) / r.width);
     my.set((e.clientY - r.top) / r.height);
   }
-  function onLeave() {
-    mx.set(0.5);
-    my.set(0.5);
-  }
+  function onLeave() { mx.set(0.5); my.set(0.5); }
   return { mx, rx: rxS, ry: ryS, onMove, onLeave };
 }
 
@@ -79,7 +76,7 @@ function Stars({ value = 5 }: { value?: number }) {
   const full = Math.floor(value);
   const half = value - full >= 0.5;
   return (
-    <div className="inline-flex items-center gap-1 text-amber-400" aria-label={`${value} out of 5 stars`}>
+    <div className="inline-flex items-center gap-1 text-amber-300" aria-label={`${value} out of 5 stars`}>
       {Array.from({ length: full }).map((_, i) => (
         <Star key={i} className="h-4 w-4 fill-current" />
       ))}
@@ -97,7 +94,7 @@ export default function TestimonialSection() {
   const count = TESTIMONIALS.length;
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  // Auto‑play
+  // Auto-play
   useEffect(() => {
     if (isPaused) return;
     const id = setInterval(() => setIndex((i) => (i + 1) % count), 4000);
@@ -121,20 +118,40 @@ export default function TestimonialSection() {
   const active = useMemo(() => TESTIMONIALS[index], [index]);
 
   return (
-    <section className="relative overflow-hidden py-24 bg-gradient-to-b from-white via-white to-gray-50 dark:from-[#0b1020] dark:via-[#0b1020] dark:to-black">
-      {/* background aurora */}
+    <section className="relative overflow-hidden dark bg-[#0b1020] text-white py-24">
+      {/* Background (aurora + grid) */}
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(70%_50%_at_50%_10%,rgba(99,102,241,0.12),transparent_50%),radial-gradient(60%_40%_at_80%_20%,rgba(16,185,129,0.12),transparent_50%)] dark:bg-[radial-gradient(70%_50%_at_50%_10%,rgba(99,102,241,0.18),transparent_50%),radial-gradient(60%_40%_at_80%_20%,rgba(168,85,247,0.18),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(80%_60%_at_50%_10%,rgba(99,102,241,0.25),transparent_50%),radial-gradient(70%_50%_at_80%_20%,rgba(34,197,94,0.20),transparent_50%),#0b1020]" />
+        <div className="absolute inset-0 opacity-40 [mask-image:radial-gradient(70%_60%_at_50%_40%,black,transparent)]">
+          <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="grid-testimonials" width="32" height="32" patternUnits="userSpaceOnUse">
+                <path d="M 32 0 L 0 0 0 32" fill="none" stroke="white" strokeOpacity="0.06" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid-testimonials)" />
+          </svg>
+        </div>
+        <motion.div
+          aria-hidden
+          className="absolute -top-40 left-1/2 h-[70rem] w-[70rem] -translate-x-1/2 rounded-full blur-3xl opacity-35"
+          style={{
+            background:
+              "conic-gradient(from 180deg at 50% 50%, rgba(59,130,246,0.35), rgba(168,85,247,0.35), rgba(34,197,94,0.35), rgba(59,130,246,0.35))",
+          }}
+          animate={{ rotate: 360 }}
+          transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
+        />
       </div>
 
       <div className="mx-auto max-w-5xl px-6">
         {/* Header */}
         <div className="mb-10 text-center">
-          <div className="mx-auto mb-3 inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/70 px-3 py-1 text-xs text-gray-800 backdrop-blur dark:border-white/20 dark:bg-white/10 dark:text-white/90">
+          <div className="mx-auto mb-3 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs text-white/90 backdrop-blur">
             <Sparkles className="h-3.5 w-3.5" /> What clients say
           </div>
-          <h2 className="text-4xl sm:text-5xl font-semibold text-gray-900 dark:text-white">Testimonials</h2>
-          <p className="mt-2 text-gray-600 dark:text-white/70">Proof of impact across marketing, design, and technology.</p>
+          <h2 className="text-4xl sm:text-5xl font-semibold">Testimonials</h2>
+          <p className="mt-2 text-white/70">Proof of impact across marketing, design, and technology.</p>
         </div>
 
         {/* Carousel */}
@@ -157,7 +174,7 @@ export default function TestimonialSection() {
             <button
               aria-label="Previous testimonial"
               onClick={() => go(-1)}
-              className="rounded-xl border border-black/10 bg-white/70 p-2 text-gray-800 shadow-sm backdrop-blur transition hover:bg-white/90 dark:border-white/20 dark:bg-white/10 dark:text-white"
+              className="rounded-xl border border-white/20 bg-white/10 p-2 text-white shadow-sm backdrop-blur transition hover:bg-white/15"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
@@ -165,7 +182,7 @@ export default function TestimonialSection() {
             <button
               aria-label="Next testimonial"
               onClick={() => go(1)}
-              className="rounded-xl border border-black/10 bg-white/70 p-2 text-gray-800 shadow-sm backdrop-blur transition hover:bg-white/90 dark:border-white/20 dark:bg-white/10 dark:text-white"
+              className="rounded-xl border border-white/20 bg-white/10 p-2 text-white shadow-sm backdrop-blur transition hover:bg-white/15"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
@@ -190,7 +207,7 @@ function Slide({ t }: { t: Testimonial }) {
       onMouseMove={onMove}
       onMouseLeave={onLeave}
       style={{ rotateX: rx, rotateY: ry }}
-      className="relative rounded-[2rem] border border-black/10 bg-white/70 p-6 shadow-2xl backdrop-blur-xl dark:border-white/15 dark:bg-white/10 [transform-style:preserve-3d]"
+      className="relative rounded-[2rem] border border-white/15 bg-white/10 p-6 text-white shadow-2xl backdrop-blur-xl [transform-style:preserve-3d]"
       role="group"
     >
       {/* border glow */}
@@ -214,13 +231,11 @@ function Slide({ t }: { t: Testimonial }) {
 
         {/* Content */}
         <div>
-          <Quote className="mb-2 h-6 w-6 text-emerald-400" />
-          <p className="text-lg text-gray-800 dark:text-white/80">
-            “{t.quote}”
-          </p>
+          <Quote className="mb-2 h-6 w-6 text-emerald-300" />
+          <p className="text-lg text-white/80">“{t.quote}”</p>
           <div className="mt-5 flex flex-wrap items-center gap-2 text-sm">
-            <span className="font-semibold text-gray-900 dark:text-white">{t.name}</span>
-            <span className="text-gray-500 dark:text-white/60">• {t.role}, {t.company}</span>
+            <span className="font-semibold text-white">{t.name}</span>
+            <span className="text-white/60">• {t.role}, {t.company}</span>
           </div>
           <div className="mt-3 sm:hidden">
             <Stars value={t.rating ?? 5} />
@@ -240,7 +255,7 @@ function Dots({ count, index, onSelect }: { count: number; index: number; onSele
           onClick={() => onSelect(i)}
           aria-label={`Go to slide ${i + 1}`}
           className={`h-2.5 w-2.5 rounded-full transition ${
-            i === index ? "bg-gray-900 dark:bg-white" : "bg-gray-400/40 hover:bg-gray-500/60 dark:bg-white/30 dark:hover:bg-white/50"
+            i === index ? "bg-white" : "bg-white/30 hover:bg-white/50"
           }`}
         />
       ))}
