@@ -5,11 +5,14 @@ import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { Check, ArrowRight, Info } from "lucide-react";
 
 /**
- * WDB – Pricing Page (Glassy + Animated) with Auto Currency (no manual toggle)
- * - Currency is taken from `wdb_currency` cookie set by middleware (else locale → currency map)
- * - Rates fetched from /api/rates (INR base, ISR cached)
+ * /app/pricing/page.tsx (example path)
+ * WDB – Pricing Page (Neon Glass, Always-Dark + Full-Bleed Backdrop)
+ * - Backdrop is fixed + outside the constrained container (no side gutters)
+ * - Palette matches FounderSection (bg #0b1020 + aurora + grid + conic glow)
+ * - Auto-currency preserved; FM v11 animations; accessibility tweaks
  */
 
+/* ===================== Types & Data ===================== */
 type Rates = Record<string, number>;
 
 const CATEGORIES = [
@@ -75,8 +78,7 @@ const SECTIONS: Section[] = [
   },
 ];
 
-/* ======= Currency helpers (auto only) ======= */
-
+/* ===================== Currency Helpers ===================== */
 type Maybe<T> = T | undefined;
 function getCookie(name: string): Maybe<string> {
   if (typeof document === "undefined") return;
@@ -113,19 +115,48 @@ function formatCurrency(amount: number, currency: string, locale: string) {
   }
 }
 
-/* ======= Animations (FM v11: use tuple easing, not strings) ======= */
+/* ===================== Animations ===================== */
 const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
-
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 24 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: EASE_OUT },
-  },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE_OUT } },
 };
 
-/* ======= Page ======= */
+/* ===================== Full-Bleed Backdrop ===================== */
+function NeonBackdrop() {
+  return (
+    <div className="pointer-events-none fixed inset-0 -z-10">
+      {/* Base */}
+      <div className="absolute inset-0 bg-[#0b1020]" />
+      {/* Radial aurora blend (blue/purple/green) */}
+      <div className="absolute inset-0 bg-[radial-gradient(80%_60%_at_50%_10%,rgba(99,102,241,0.25),transparent_50%),radial-gradient(70%_50%_at_80%_20%,rgba(34,197,94,0.20),transparent_50%)]" />
+      {/* Subtle grid */}
+      <div className="absolute inset-0 opacity-40 [mask-image:radial-gradient(70%_60%_at_50%_42%,black,transparent)]">
+        <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="grid-pricing-fixed" width="32" height="32" patternUnits="userSpaceOnUse">
+              <path d="M 32 0 L 0 0 0 32" fill="none" stroke="white" strokeOpacity="0.06" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid-pricing-fixed)" />
+        </svg>
+      </div>
+      {/* Slow conic glow */}
+      <div
+        aria-hidden
+        className="absolute -top-40 left-1/2 h-[70rem] w-[70rem] -translate-x-1/2 rounded-full blur-3xl opacity-35"
+        style={{
+          background:
+            "conic-gradient(from 180deg at 50% 50%, rgba(59,130,246,0.35), rgba(168,85,247,0.35), rgba(34,197,94,0.35), rgba(59,130,246,0.35))",
+          animation: "spin 50s linear infinite",
+        }}
+      />
+      <style jsx>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+}
+
+/* ===================== Page ===================== */
 export default function PricingPageWDB() {
   const [active, setActive] = useState<(typeof CATEGORIES)[number]["key"]>("seo");
   const reduce = useReducedMotion();
@@ -140,7 +171,10 @@ export default function PricingPageWDB() {
     setLocale(loc);
     const cookieCur = getCookie("wdb_currency");
     setCurrency(cookieCur || currencyFromLocale(loc));
-    fetchRates().then((r) => { setRates(r); setLoaded(true); });
+    fetchRates().then((r) => {
+      setRates(r);
+      setLoaded(true);
+    });
   }, []);
 
   const sections = useMemo(() => {
@@ -155,136 +189,121 @@ export default function PricingPageWDB() {
   }, [currency, rates, locale]);
 
   return (
-    <main className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-      {/* Background */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, ease: EASE_OUT }}
-          className="absolute -top-40 -left-32 h-[36rem] w-[36rem] rounded-full bg-gradient-to-br from-emerald-400/25 via-sky-400/20 to-fuchsia-400/20 blur-3xl"
-        />
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.15, ease: EASE_OUT }}
-          className="absolute -bottom-48 -right-40 h-[40rem] w-[40rem] rounded-full bg-gradient-to-tr from-amber-300/20 via-rose-300/20 to-indigo-300/25 blur-3xl"
-        />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/10" />
-      </div>
+    <div className="relative min-h-screen text-white">
+      <NeonBackdrop />
 
-      {/* Note only (no toggle) */}
-      <motion.div
-        variants={fadeUp}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.4 }}
-        className="mb-8 flex items-center justify-center gap-2 text-sm text-muted-foreground"
-      >
-        <Info className="h-4 w-4" />
-        <span>Prices auto-convert from INR (cached ~12h)</span>
-      </motion.div>
+      <main className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+        {/* Note */}
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.4 }}
+          className="mb-8 flex items-center justify-center gap-2 text-sm text-white/70"
+        >
+          <Info className="h-4 w-4" />
+          <span>Prices auto-convert from INR (cached ~12h)</span>
+        </motion.div>
 
-      {/* Sticky chips */}
-      <div className=" top-16 z-30 mb-10">
-        <div className="relative mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-2 py-2 backdrop-blur-md shadow-[0_0_0_1px_rgba(255,255,255,0.04)]">
-          {CATEGORIES.map((cat) => {
-            const isActive = active === cat.key;
-            return (
-              <button
-                key={cat.key}
-                onClick={() => {
-                  setActive(cat.key);
-                  document.getElementById(cat.key)?.scrollIntoView({ behavior: "smooth", block: "start" });
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
+        {/* Sticky chips */}
+        <div className="top-16 z-30 mb-10">
+          <div className="relative mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-2 py-2 backdrop-blur-md shadow-[0_0_0_1px_rgba(255,255,255,0.04)]">
+            {CATEGORIES.map((cat) => {
+              const isActive = active === cat.key;
+              return (
+                <button
+                  key={cat.key}
+                  onClick={() => {
                     setActive(cat.key);
                     document.getElementById(cat.key)?.scrollIntoView({ behavior: "smooth", block: "start" });
-                  }
-                }}
-                aria-current={isActive}
-                className={`relative rounded-full border border-white/10 px-4 py-2 text-sm transition-all hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/60 ${
-                  isActive ? "bg-white/15 text-foreground" : "bg-white/5 text-foreground"
-                } backdrop-blur-md`}
-              >
-                {cat.label}
-                {isActive && (
-                  <motion.span
-                    layoutId="chip-underline"
-                    className="absolute inset-0 rounded-full ring-2 ring-emerald-400/60"
-                    transition={{
-                      type: useReducedMotion() ? "tween" as const : "spring",
-                      stiffness: 300,
-                      damping: 25,
-                      duration: 0.25,
-                    }}
-                  />
-                )}
-              </button>
-            );
-          })}
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setActive(cat.key);
+                      document.getElementById(cat.key)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
+                  }}
+                  aria-current={isActive}
+                  className={`relative rounded-full border border-white/10 px-4 py-2 text-sm transition-all hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-400/60 ${
+                    isActive ? "bg-white/15 text-white" : "bg-white/5 text-white"
+                  } backdrop-blur-md`}
+                >
+                  {cat.label}
+                  {isActive && (
+                    <motion.span
+                      layoutId="chip-underline"
+                      className="absolute inset-0 rounded-full ring-2 ring-emerald-400/60"
+                      transition={
+                        reduce
+                          ? { type: "tween" as const, duration: 0.25 }
+                          : { type: "spring" as const, stiffness: 300, damping: 25 }
+                      }
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
 
-      {/* Sections */}
-      <div className="space-y-20">
-        {sections.map((section, sIdx) => (
-          <section id={section.key} key={section.key} className="scroll-mt-24">
-            <motion.header
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, amount: 0.4 }}
-              className="mb-8 text-center"
-            >
-              <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">{section.label}</h2>
-              <p className="mt-2 text-sm text-muted-foreground">Select a plan that matches your goals & budget.</p>
-            </motion.header>
+        {/* Sections */}
+        <div className="space-y-20">
+          {sections.map((section, sIdx) => (
+            <section id={section.key} key={section.key} className="scroll-mt-24">
+              <motion.header
+                variants={fadeUp}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, amount: 0.4 }}
+                className="mb-8 text-center"
+              >
+                <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">{section.label}</h2>
+                <p className="mt-2 text-sm text-white/70">Select a plan that matches your goals & budget.</p>
+              </motion.header>
 
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {section.tiers.map((tier, i) => (
-                <GlassCard
-                  key={tier.name}
-                  tier={tier as Tier & { displayPrice?: string }}
-                  sectionKey={section.key}
-                  delay={i * 0.06 + sIdx * 0.02}
-                  reduce={useReducedMotion()}
-                  loaded={loaded}
-                />
-              ))}
-            </div>
-          </section>
-        ))}
-      </div>
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                {section.tiers.map((tier, i) => (
+                  <GlassCard
+                    key={tier.name}
+                    tier={tier as Tier & { displayPrice?: string }}
+                    sectionKey={section.key}
+                    delay={i * 0.06 + sIdx * 0.02}
+                    reduce={reduce}
+                    loaded={loaded}
+                  />
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
 
-      {/* Footer CTA */}
-      <motion.div
-        variants={fadeUp}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.4 }}
-        className="mt-24 rounded-2xl border border-white/15 bg-white/10 p-6 text-center backdrop-blur-md shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]"
-      >
-        <h3 className="text-xl font-semibold">Need a custom plan?</h3>
-        <p className="mx-auto mt-2 max-w-2xl text-sm text-muted-foreground">
-          Tell us your goals and baseline. We'll tailor a package across SEO, content, ads, and web so you only pay for what you need.
-        </p>
-        <a
-          href="/contact"
-          className="mt-4 inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/10 px-5 py-2 text-sm font-medium backdrop-blur-md transition hover:shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60"
+        {/* Footer CTA */}
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.4 }}
+          className="mt-24 rounded-2xl border border-white/15 bg-white/10 p-6 text-center backdrop-blur-md shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]"
         >
-          Talk to an expert
-          <ArrowRight className="ml-2 h-4 w-4" />
-        </a>
-      </motion.div>
-    </main>
+          <h3 className="text-xl font-semibold">Need a custom plan?</h3>
+          <p className="mx-auto mt-2 max-w-2xl text-sm text-white/70">
+            Tell us your goals and baseline. We'll tailor a package across SEO, content, ads, and web so you only pay for what you need.
+          </p>
+          <a
+            href="/contact"
+            className="mt-4 inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/10 px-5 py-2 text-sm font-medium backdrop-blur-md transition hover:shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60"
+          >
+            Talk to an expert
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </a>
+        </motion.div>
+      </main>
+    </div>
   );
 }
 
-/* ======= Card ======= */
+/* ===================== Card ===================== */
 function GlassCard({
   tier,
   sectionKey,
@@ -314,7 +333,10 @@ function GlassCard({
       viewport={{ once: true, amount: 0.2 }}
       transition={{ delay: reduce ? 0 : delay }}
       className="group relative flex h-full flex-col rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur-md shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)] ring-1 ring-transparent transition will-change-transform hover:-translate-y-1 hover:shadow-lg hover:ring-emerald-400/30"
-      style={{ backgroundImage: "radial-gradient(1200px 400px at 50% -10%, rgba(16,185,129,0.08), transparent 60%)" }}
+      style={{
+        backgroundImage:
+          "radial-gradient(1200px 400px at 50% -10%, rgba(16,185,129,0.08), transparent 60%)",
+      }}
     >
       {tier.badge && (
         <motion.span
@@ -331,7 +353,7 @@ function GlassCard({
         <h3 className="text-lg font-semibold tracking-tight">{tier.name}</h3>
         <div className="mt-2 flex items-end gap-1">
           <span className="text-3xl font-bold">{loaded && tier.displayPrice ? tier.displayPrice : fallbackINR}</span>
-          <span className="text-xs text-muted-foreground">/ month</span>
+          <span className="text-xs text-white/70">/ month</span>
         </div>
       </div>
 
@@ -354,14 +376,16 @@ function GlassCard({
           Choose plan
           <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
         </motion.a>
-        <p className="mt-3 text-center text-xs text-muted-foreground">No hidden fees or surprises</p>
+        <p className="mt-3 text-center text-xs text-white/70">No hidden fees or surprises</p>
       </div>
 
+      {/* glossy corners highlight on hover */}
       <div
         aria-hidden
         className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition group-hover:opacity-100"
         style={{
-          background: "linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.06) 20%, rgba(255,255,255,0.0) 40%)",
+          background:
+            "linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.06) 20%, rgba(255,255,255,0.0) 40%)",
           WebkitMask:
             "radial-gradient(26px 26px at 24px 24px, black 40%, transparent 41%), radial-gradient(26px 26px at calc(100% - 24px) calc(100% - 24px), black 40%, transparent 41%)",
           mask:
