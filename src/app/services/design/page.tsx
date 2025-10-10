@@ -21,23 +21,17 @@ import {
  * — Ultra‑modern, glassy, and fully animated (Design Services)
  * — Zero external images, Tailwind + Framer Motion only
  *
- * Sections
- * 1) Aurora + Grid background
- * 2) Hero with 3D‑tilt headline, parallax orbs, glossy CTAs
- * 3) KPI strip with animated counters
- * 4) Services Grid (Brand Identity, UI/UX, Web Design, Design Systems)
- * 5) Process Timeline
- * 6) Case Highlights
- * 7) Testimonial + FAQ (Accordion)
- * 8) Contact CTA card
- * 9) Sticky CTA footer
+ * Fixed: Framer Motion transition type error by using a cubic‑bezier array for `ease` instead of the string "easeOut".
  */
+
+// Use a cubic‑bezier array (Easing) instead of a string for type safety with Framer Motion v11+.
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1]; // approx easeOut
 
 const fadeUp = (d = 0) => ({
   initial: { opacity: 0, y: 28 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, amount: 0.3 },
-  transition: { duration: 0.7, delay: d, ease: "easeOut" },
+  transition: { duration: 0.7, delay: d, ease: EASE },
 });
 
 const SERVICES = [
@@ -366,7 +360,7 @@ function ServiceCard({ icon: Icon, title, blurb, bullets, index }: any) {
 
 function AnimatedCounter({ to, suffix = "" }: { to: number; suffix?: string }) {
   return (
-    <motion.span className="block text-2xl font-semibold text-gray-900 md:text-3xl dark:text-white" initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.6 }} transition={{ duration: 0.6 }}>
+    <motion.span className="block text-2xl font-semibold text-gray-900 md:text-3xl dark:text-white" initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.6 }} transition={{ duration: 0.6, ease: EASE }}>
       <Counter to={to} />{suffix}
     </motion.span>
   );
@@ -376,7 +370,7 @@ function Counter({ to }: { to: number }) {
   const decimals = String(to).includes(".") ? 1 : 0;
   return (
     <AnimatePresence mode="wait">
-      <motion.span key={to} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }}>
+      <motion.span key={to} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6, ease: EASE }}>
         {to.toFixed(decimals)}
       </motion.span>
     </AnimatePresence>
@@ -402,7 +396,7 @@ function Accordion({ items }: { items: { q: string; a: string }[] }) {
 function Aurora() {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-      <motion.div className="absolute -top-32 left-1/2 h-[42rem] w-[42rem] -translate-x-1/2 rounded-full bg-gradient-to-tr from-indigo-400/25 via-emerald-400/25 to-fuchsia-400/25 blur-3xl" initial={{ opacity: 0.2, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.2, ease: "easeOut" }} />
+      <motion.div className="absolute -top-32 left-1/2 h-[42rem] w-[42rem] -translate-x-1/2 rounded-full bg-gradient-to-tr from-indigo-400/25 via-emerald-400/25 to-fuchsia-400/25 blur-3xl" initial={{ opacity: 0.2, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.2, ease: EASE }} />
       <motion.div className="absolute bottom-[-20%] left-[10%] h-72 w-72 rounded-full bg-gradient-to-tr from-fuchsia-400/20 to-cyan-400/20 blur-3xl" animate={{ y: [0, -12, 0] }} transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }} />
       <motion.div className="absolute right-[10%] top-[20%] h-72 w-72 rounded-full bg-gradient-to-tr from-emerald-400/20 to-indigo-400/20 blur-3xl" animate={{ y: [0, 10, 0] }} transition={{ repeat: Infinity, duration: 9, ease: "easeInOut" }} />
     </div>
@@ -413,7 +407,7 @@ function Grid() {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
       <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent,transparent_95%,rgba(0,0,0,.05)_95%),linear-gradient(to_right,transparent,transparent_95%,rgba(0,0,0,.05)_95%)] bg-[length:24px_24px] dark:bg-[linear-gradient(to_bottom,transparent,transparent_95%,rgba(255,255,255,.08)_95%),linear-gradient(to_right,transparent,transparent_95%,rgba(255,255,255,.08)_95%)]" />
-      <motion.div className="absolute inset-0 bg-[radial-gradient(600px_200px_at_50%_10%,rgba(255,255,255,.18),transparent)] dark:bg-[radial-gradient(600px_200px_at_50%_10%,rgba(255,255,255,.06),transparent)]" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 1.2 }} />
+      <motion.div className="absolute inset-0 bg-[radial-gradient(600px_200px_at_50%_10%,rgba(255,255,255,.18),transparent)] dark:bg-[radial-gradient(600px_200px_at_50%_10%,rgba(255,255,255,.06),transparent)]" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 1.2, ease: EASE }} />
     </div>
   );
 }

@@ -27,23 +27,19 @@ import {
  * — Ultra‑modern, glassy, and fully animated
  * — Zero external images, Tailwind + Framer Motion only
  *
- * Sections
- * 1) Aurora + Grid background
- * 2) Hero with 3D‑tilt headline, parallax orbs, glossy CTAs
- * 3) KPI strip with animated counters
- * 4) Services Grid (SEO, Paid Ads, Social, CRO)
- * 5) Process Timeline
- * 6) Case Highlights
- * 7) Testimonial + FAQ (Accordion)
- * 8) Contact CTA card
- * 9) Sticky CTA footer
+ * NOTE: Fixed Framer Motion type error by replacing string easings (e.g. "easeOut", "easeInOut")
+ * with cubic‑bezier arrays which satisfy the Easing type in newer versions.
  */
+
+// Cubic‑bezier easing constants (type-safe for Framer Motion v11+)
+const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const EASE_IN_OUT: [number, number, number, number] = [0.42, 0, 0.58, 1];
 
 const fadeUp = (d = 0) => ({
   initial: { opacity: 0, y: 28 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, amount: 0.3 },
-  transition: { duration: 0.7, delay: d, ease: "easeOut" },
+  transition: { duration: 0.7, delay: d, ease: EASE_OUT },
 });
 
 const SERVICES = [
@@ -423,7 +419,7 @@ function AnimatedCounter({ to, suffix = "" }: { to: number; suffix?: string }) {
       initial={{ opacity: 0, y: 6 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.6 }}
-      transition={{ duration: 0.6 }}
+      transition={{ duration: 0.6, ease: EASE_OUT }}
     >
       <Counter to={to} />{suffix}
     </motion.span>
@@ -439,7 +435,7 @@ function Counter({ to }: { to: number }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 0.6, ease: EASE_OUT }}
       >
         {to.toFixed(decimals)}
       </motion.span>
@@ -447,7 +443,7 @@ function Counter({ to }: { to: number }) {
   );
 }
 
-function Accordion({ items }: { items: { q: string; a: string }[] }) {
+function Accordion({ items }: { items: ReadonlyArray<{ q: string; a: string }> }) {
   return (
     <div className="divide-y divide-white/10">
       {items.map((it) => (
@@ -470,17 +466,17 @@ function Aurora() {
         className="absolute -top-32 left-1/2 h-[42rem] w-[42rem] -translate-x-1/2 rounded-full bg-gradient-to-tr from-indigo-400/25 via-emerald-400/25 to-fuchsia-400/25 blur-3xl"
         initial={{ opacity: 0.2, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.2, ease: "easeOut" }}
+        transition={{ duration: 1.2, ease: EASE_OUT }}
       />
       <motion.div
         className="absolute bottom-[-20%] left-[10%] h-72 w-72 rounded-full bg-gradient-to-tr from-fuchsia-400/20 to-cyan-400/20 blur-3xl"
         animate={{ y: [0, -12, 0] }}
-        transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
+        transition={{ repeat: Infinity, duration: 8, ease: EASE_IN_OUT }}
       />
       <motion.div
         className="absolute right-[10%] top-[20%] h-72 w-72 rounded-full bg-gradient-to-tr from-emerald-400/20 to-indigo-400/20 blur-3xl"
         animate={{ y: [0, 10, 0] }}
-        transition={{ repeat: Infinity, duration: 9, ease: "easeInOut" }}
+        transition={{ repeat: Infinity, duration: 9, ease: EASE_IN_OUT }}
       />
     </div>
   );
@@ -498,7 +494,7 @@ function Grid() {
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
-        transition={{ duration: 1.2 }}
+        transition={{ duration: 1.2, ease: EASE_OUT }}
       />
     </div>
   );

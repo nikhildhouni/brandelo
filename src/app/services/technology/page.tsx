@@ -23,13 +23,21 @@ import {
  * app/services/technology/page.tsx — Website Technology (Only)
  * Scope: WordPress, React, PHP/Laravel, Next.js, E‑commerce (Shopify/Woo/Headless)
  * Style: glassy + animated (Tailwind + Framer Motion only)
+ *
+ * Fixes:
+ * 1) Framer Motion typing — replace string easings ("easeOut", "easeInOut") with cubic‑bezier arrays.
+ * 2) Tailwind typos — `bg:white/40` → `bg-white/40`, `dark:bg:white` → `dark:bg-white`.
  */
+
+// Framer Motion easing constants (type‑safe)
+const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const EASE_IN_OUT: [number, number, number, number] = [0.42, 0, 0.58, 1];
 
 const fadeUp = (d = 0) => ({
   initial: { opacity: 0, y: 28 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, amount: 0.3 },
-  transition: { duration: 0.7, delay: d, ease: "easeOut" },
+  transition: { duration: 0.7, delay: d, ease: EASE_OUT },
 });
 
 const SERVICES = [
@@ -208,7 +216,7 @@ export default function TechnologyWebsitesPage() {
         <div className="pointer-events-auto glassy-card flex items-center gap-3 rounded-2xl px-4 py-3 shadow-xl">
           <Rocket className="h-4 w-4" />
           <span className="text-sm">Free homepage speed audit</span>
-          <Link href="/contact" className="ml-1 inline-flex items-center gap-2 rounded-xl border border-white/20 bg-gray-900 px-3 py-1.5 text-xs text-white hover:-translate-y-0.5 dark:bg:white dark:text-black">
+          <Link href="/contact" className="ml-1 inline-flex items-center gap-2 rounded-xl border border-white/20 bg-gray-900 px-3 py-1.5 text-xs text-white hover:-translate-y-0.5 dark:bg-white dark:text-black">
             Talk to engineering
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
@@ -241,7 +249,7 @@ function Hero() {
   return (
     <section className="relative" onMouseMove={onMouseMove}>
       <div className="mx-auto max-w-7xl px-6 pt-24 pb-8 md:pt-32">
-        <motion.div {...fadeUp(0)} className="inline-flex items-center gap-2 rounded-full border border-white/20 bg:white/40 px-3 py-1 text-sm text-gray-700 backdrop-blur dark:bg-white/10 dark:text-gray-200">
+        <motion.div {...fadeUp(0)} className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/40 px-3 py-1 text-sm text-gray-700 backdrop-blur dark:bg-white/10 dark:text-gray-200">
           <Sparkles className="h-4 w-4" />
           <span>Web that ships fast</span>
         </motion.div>
@@ -321,7 +329,7 @@ function ServiceCard({ icon: Icon, title, blurb, bullets, index }: any) {
 
 function AnimatedCounter({ to, suffix = "" }: { to: number; suffix?: string }) {
   return (
-    <motion.span className="block text-2xl font-semibold text-gray-900 md:text-3xl dark:text-white" initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.6 }} transition={{ duration: 0.6 }}>
+    <motion.span className="block text-2xl font-semibold text-gray-900 md:text-3xl dark:text-white" initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.6 }} transition={{ duration: 0.6, ease: EASE_OUT }}>
       <Counter to={to} />{suffix}
     </motion.span>
   );
@@ -331,7 +339,7 @@ function Counter({ to }: { to: number }) {
   const decimals = String(to).includes(".") ? 1 : 0;
   return (
     <AnimatePresence mode="wait">
-      <motion.span key={to} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }}>
+      <motion.span key={to} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6, ease: EASE_OUT }}>
         {to.toFixed(decimals)}
       </motion.span>
     </AnimatePresence>
@@ -341,9 +349,9 @@ function Counter({ to }: { to: number }) {
 function Aurora() {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-      <motion.div className="absolute -top-32 left-1/2 h-[42rem] w-[42rem] -translate-x-1/2 rounded-full bg-gradient-to-tr from-indigo-400/25 via-emerald-400/25 to-fuchsia-400/25 blur-3xl" initial={{ opacity: 0.2, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.2, ease: "easeOut" }} />
-      <motion.div className="absolute bottom-[-20%] left-[10%] h-72 w-72 rounded-full bg-gradient-to-tr from-fuchsia-400/20 to-cyan-400/20 blur-3xl" animate={{ y: [0, -12, 0] }} transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }} />
-      <motion.div className="absolute right-[10%] top-[20%] h-72 w-72 rounded-full bg-gradient-to-tr from-emerald-400/20 to-indigo-400/20 blur-3xl" animate={{ y: [0, 10, 0] }} transition={{ repeat: Infinity, duration: 9, ease: "easeInOut" }} />
+      <motion.div className="absolute -top-32 left-1/2 h-[42rem] w-[42rem] -translate-x-1/2 rounded-full bg-gradient-to-tr from-indigo-400/25 via-emerald-400/25 to-fuchsia-400/25 blur-3xl" initial={{ opacity: 0.2, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.2, ease: EASE_OUT }} />
+      <motion.div className="absolute bottom-[-20%] left-[10%] h-72 w-72 rounded-full bg-gradient-to-tr from-fuchsia-400/20 to-cyan-400/20 blur-3xl" animate={{ y: [0, -12, 0] }} transition={{ repeat: Infinity, duration: 8, ease: EASE_IN_OUT }} />
+      <motion.div className="absolute right-[10%] top-[20%] h-72 w-72 rounded-full bg-gradient-to-tr from-emerald-400/20 to-indigo-400/20 blur-3xl" animate={{ y: [0, 10, 0] }} transition={{ repeat: Infinity, duration: 9, ease: EASE_IN_OUT }} />
     </div>
   );
 }
@@ -352,8 +360,7 @@ function Grid() {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
       <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent,transparent_95%,rgba(0,0,0,.05)_95%),linear-gradient(to_right,transparent,transparent_95%,rgba(0,0,0,.05)_95%)] bg-[length:24px_24px] dark:bg-[linear-gradient(to_bottom,transparent,transparent_95%,rgba(255,255,255,.08)_95%),linear-gradient(to_right,transparent,transparent_95%,rgba(255,255,255,.08)_95%)]" />
-      <motion.div className="absolute inset-0 bg-[radial-gradient(600px_200px_at_50%_10%,rgba(255,255,255,.18),transparent)] dark:bg-[radial-gradient(600px_200px_at_50%_10%,rgba(255,255,255,.06),transparent)]" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 1.2 }} />
+      <motion.div className="absolute inset-0 bg-[radial-gradient(600px_200px_at_50%_10%,rgba(255,255,255,.18),transparent)] dark:bg-[radial-gradient(600px_200px_at_50%_10%,rgba(255,255,255,.06),transparent)]" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 1.2, ease: EASE_OUT }} />
     </div>
   );
 }
-98
