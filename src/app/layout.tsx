@@ -2,9 +2,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import ContactFooterWDB from "@/components/Footer";
-import SplashCursor from "@/components/SplashCursor";
+import AppShell from "@/components/AppShell";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -16,16 +14,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    // Removed className="dark" so global theme can be light/system.
     <html lang="en" suppressHydrationWarning>
       <body
         suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-black text-black dark:text-white`}
       >
-        <Navbar />
-        <SplashCursor/>
-        {children}
-        <ContactFooterWDB />
+        {/* AppShell is a CLIENT component that will:
+            1. Show the animated Brandelo splash first
+            2. Then reveal Navbar + page + Footer */}
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );
