@@ -42,42 +42,42 @@ const DEFAULT_ITEMS: WorkItem[] = [
   {
     title: "SEO Optimization",
     desc:
-      "xyz agency is a leading Social Media Marketing Agency in Delhi NCR offering Paid Social Media Marketing Services & SMM Services in India.",
+      "Brandelo is a leading Social Media Marketing Agency in Delhi NCR offering Paid Social Media Marketing Services & SMM Services in India.",
     href: "/services/seo",
     icon: "seo",
   },
   {
     title: "Website Development",
     desc:
-      "xyz agency is a leading Social Media Marketing Agency in Delhi NCR offering Paid Social Media Marketing Services & SMM Services in India.",
+      "Brandelo is a leading Social Media Marketing Agency in Delhi NCR offering Paid Social Media Marketing Services & SMM Services in India.",
     href: "/services/website-development",
     icon: "web",
   },
   {
     title: "Social Media Marketing",
     desc:
-      "xyz agency is a leading Social Media Marketing Agency in Delhi NCR offering Paid Social Media Marketing Services & SMM Services in India.",
+      "Brandelo is a leading Social Media Marketing Agency in Delhi NCR offering Paid Social Media Marketing Services & SMM Services in India.",
     href: "/services/social-media-marketing",
     icon: "smm",
   },
   {
     title: "SEO Optimization",
     desc:
-      "xyz agency is a leading Social Media Marketing Agency in Delhi NCR offering Paid Social Media Marketing Services & SMM Services in India.",
+      "Brandelo is a leading Social Media Marketing Agency in Delhi NCR offering Paid Social Media Marketing Services & SMM Services in India.",
     href: "/services/seo",
     icon: "seo",
   },
   {
     title: "Website Development",
     desc:
-      "xyz agency is a leading Social Media Marketing Agency in Delhi NCR offeri1ng Paid Social Media Marketing Services & SMM Services in India.",
+      "Brandelo is a leading Social Media Marketing Agency in Delhi NCR offeri1ng Paid Social Media Marketing Services & SMM Services in India.",
     href: "/services/website-development",
     icon: "web",
   },
   {
     title: "Social Media Marketing",
     desc:
-      "xyz agency is a leading Social Media Marketing Agency in Delhi NCR offering Paid Social Media Marketing Services & SMM Services in India.",
+      "Brandelo is a leading Social Media Marketing Agency in Delhi NCR offering Paid Social Media Marketing Services & SMM Services in India.",
     href: "/services/social-media-marketing",
     icon: "smm",
   },

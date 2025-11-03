@@ -46,7 +46,7 @@ export default function Navbar2D() {
             <div className="flex items-center justify-between py-2">
               <div className="flex flex-wrap gap-5">
                 <Info icon="📍" text="Noida Sector 63 • H-187" />
-                <Info icon="✉️" text="info@xyzagency.com" href="mailto:info@xyzagency.com" />
+                <Info icon="✉️" text="info@brandelo.com" href="mailto:info@brandelo.com" />
                 <Info icon="📞" text="+91 98997 83757" href="tel:+919899783757" />
               </div>
               <div className="flex items-center gap-3">

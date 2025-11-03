@@ -61,7 +61,7 @@ function useParallaxTilt(intensity = 14) {
  * - Background, grid and glass are set to the dark palette unconditionally.
  */
 export default function Hero3DGlassy({
-  kicker = "XYZ • Digital Marketing",
+  kicker = "Brandelo • Digital Marketing",
   title = "Amplify Growth with Data-Driven Marketing",
   subtitle = "3D experiences, glassy UI, and high-impact campaigns that convert. We blend SEO, Paid Ads, and Content to scale your brand.",
   primary = { label: "Get Free Audit", href: "/contact" },

@@ -36,9 +36,9 @@ type Props = {
 };
 
 export default function FounderShowcaseNeo({
-  name = "XYZ",
+  name = "Brandelo",
   title = "Founder · Marketing & Growth",
-  company = "XYZ Agency",
+  company = "Brandelo",
   imageSrc = "/images/founder/founder.png",
   socials = [
     { type: "instagram", href: "https://instagram.com/" },

@@ -25,7 +25,7 @@ type Props = {
 };
 
 export default function ContactFooterWDB({
-  email = "info@xyzagency.com",
+  email = "info@brandelo.com",
   phone = "+91 98997 93757",
   address = ["UP, Noida", "Sector 63"],
   hours = ["Office hours", "Monday–Friday", "10AM–7PM"],
@@ -222,7 +222,7 @@ export default function ContactFooterWDB({
                 GST NO: <span className="font-semibold text-white">{gst}</span>
               </div>
               <div>
-                ©{new Date().getFullYear()} XYZ Agency &nbsp; | &nbsp; All Rights Reserved
+                ©{new Date().getFullYear()} Brandelo &nbsp; | &nbsp; All Rights Reserved
               </div>
             </div>
 
