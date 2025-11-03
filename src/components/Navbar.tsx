@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -19,15 +20,14 @@ export default function Navbar2D() {
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname?.startsWith(href));
 
   return (
-    // ✅ make the whole bar dark so no white background shows
     <header className="sticky top-0 z-50 bg-[#0b1020]">
-      {/* ✅ dark backdrop behind navbar to match page sections */}
       <div className="relative">
         {/* aurora blobs */}
         <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
           <div className="absolute -top-24 left-1/3 h-72 w-72 rounded-full bg-gradient-to-tr from-emerald-400/30 via-sky-400/30 to-fuchsia-400/30 blur-3xl animate-slow-float" />
           <div className="absolute -bottom-24 right-1/4 h-80 w-80 rounded-full bg-gradient-to-tr from-amber-400/20 via-rose-400/20 to-indigo-400/20 blur-3xl animate-slower-float" />
         </div>
+
         {/* subtle grid wash */}
         <div className="pointer-events-none absolute inset-0 -z-10 opacity-[.18]">
           <svg className="h-full w-full">
@@ -40,7 +40,7 @@ export default function Navbar2D() {
           </svg>
         </div>
 
-        {/* top info strip (dark glass) */}
+        {/* top info strip */}
         <div className="hidden md:block bg-[#0b1020]/90 text-white/90 text-[13px] backdrop-blur supports-[backdrop-filter]:backdrop-blur">
           <div className="mx-auto max-w-7xl px-4">
             <div className="flex items-center justify-between py-2">
@@ -59,7 +59,7 @@ export default function Navbar2D() {
           </div>
         </div>
 
-        {/* nav */} 
+        {/* nav */}
         <div className="px-3 py-3">
           <nav className="mx-auto max-w-7xl">
             <div className="relative">
@@ -68,12 +68,16 @@ export default function Navbar2D() {
               {/* glass shell */}
               <div className="rounded-2xl border border-white/12 bg-white/10 shadow-[0_10px_40px_rgba(0,0,0,.35)] backdrop-blur-xl">
                 <div className="flex h-[72px] items-center justify-between px-4 md:px-6">
-                  {/* Brand */}
-                  <Link href="/" className="group flex items-center gap-3">
-                    <Logo2D />
-                    <span className="text-lg font-semibold tracking-tight text-white transition-colors group-hover:text-emerald-200">
-                      Brand<span className="text-white/70">elo</span>
-                    </span>
+                  {/* ✅ Brand logo only (removed Logo2D) */}
+                  <Link href="/" className="flex items-center">
+                    <Image
+                      src="/logo.png"
+                      alt="Brand logo"
+                      width={140}
+                      height={40}
+                      className="object-contain"
+                      priority
+                    />
                   </Link>
 
                   {/* Desktop links */}
@@ -114,13 +118,20 @@ export default function Navbar2D() {
             </div>
           </nav>
 
-        {/* mobile drawer */}
-        <MobileMenu items={items} isActive={isActive} open={open} onClose={() => setOpen(false)} />
+          {/* mobile drawer */}
+          <MobileMenu items={items} isActive={isActive} open={open} onClose={() => setOpen(false)} />
         </div>
       </div>
 
       <style jsx>{`
-        @keyframes hue { 0% { filter: hue-rotate(0deg) } 100% { filter: hue-rotate(360deg) } }
+        @keyframes hue {
+          0% {
+            filter: hue-rotate(0deg);
+          }
+          100% {
+            filter: hue-rotate(360deg);
+          }
+        }
       `}</style>
     </header>
   );
@@ -136,15 +147,19 @@ function Info({ icon, text, href }: { icon: string; text: string; href?: string 
     </span>
   );
   return href ? (
-    <a href={href} className="hover:underline underline-offset-2">{Content}</a>
-  ) : Content;
+    <a href={href} className="hover:underline underline-offset-2">
+      {Content}
+    </a>
+  ) : (
+    Content
+  );
 }
 
 function Social({ type, href = "#" }: { type: "instagram" | "facebook" | "twitter"; href?: string }) {
   const iconMap = {
     instagram: <Instagram className="h-4 w-4" />,
     facebook: <Facebook className="h-4 w-4" />,
-    twitter:   <Twitter className="h-4 w-4" />,
+    twitter: <Twitter className="h-4 w-4" />,
   } as const;
   return (
     <a
@@ -159,15 +174,6 @@ function Social({ type, href = "#" }: { type: "instagram" | "facebook" | "twitte
   );
 }
 
-function Logo2D() {
-  return (
-    <div className="relative grid h-9 w-9 place-items-center">
-      <div className="absolute inset-0 -z-10 rounded-xl bg-gradient-to-tr from-emerald-400/60 to-sky-400/60 blur-md" />
-      <div className="h-7 w-7 rounded-xl bg-gradient-to-br from-emerald-500 to-sky-500 shadow-lg ring-1 ring-white/10" />
-    </div>
-  );
-}
-
 function MobileToggle({ open, onToggle }: { open: boolean; onToggle: () => void }) {
   return (
     <button
@@ -177,17 +183,34 @@ function MobileToggle({ open, onToggle }: { open: boolean; onToggle: () => void 
       className="rounded-xl p-2 text-white ring-1 ring-white/20 backdrop-blur hover:bg-white/10"
     >
       <svg viewBox="0 0 24 24" className="h-6 w-6">
-        <path d={open ? "M6 18L18 6M6 6l12 12" : "M3 6h18M3 12h18M3 18h18"} stroke="currentColor" strokeWidth={2} strokeLinecap="round" />
+        <path
+          d={open ? "M6 18L18 6M6 6l12 12" : "M3 6h18M3 12h18M3 18h18"}
+          stroke="currentColor"
+          strokeWidth={2}
+          strokeLinecap="round"
+        />
       </svg>
     </button>
   );
 }
 
 function MobileMenu({
-  items, isActive, open, onClose,
-}: { items: Item[]; isActive: (href: string) => boolean | undefined; open: boolean; onClose: () => void }) {
+  items,
+  isActive,
+  open,
+  onClose,
+}: {
+  items: Item[];
+  isActive: (href: string) => boolean | undefined;
+  open: boolean;
+  onClose: () => void;
+}) {
   return (
-    <div className={`lg:hidden transition-[max-height,opacity] duration-500 ease-out overflow-hidden ${open ? "max-h-80 opacity-100" : "max-h-0 opacity-0"}`}>
+    <div
+      className={`lg:hidden transition-[max-height,opacity] duration-500 ease-out overflow-hidden ${
+        open ? "max-h-80 opacity-100" : "max-h-0 opacity-0"
+      }`}
+    >
       <div className="mx-auto max-w-7xl px-4 pb-4">
         <div className="mt-3 rounded-2xl border border-white/12 bg-white/10 p-2 backdrop-blur-xl shadow-lg">
           {items.map((it) => (
@@ -195,7 +218,9 @@ function MobileMenu({
               key={it.href}
               href={it.href}
               onClick={onClose}
-              className={`block rounded-xl px-3 py-2 text-sm font-medium text-white/90 hover:bg-white/10 ${isActive(it.href) ? "text-emerald-200" : ""}`}
+              className={`block rounded-xl px-3 py-2 text-sm font-medium text-white/90 hover:bg-white/10 ${
+                isActive(it.href) ? "text-emerald-200" : ""
+              }`}
             >
               {it.label}
             </Link>
