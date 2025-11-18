@@ -24,7 +24,7 @@ export default function SplashScreen() {
 
       {/* LETTERS */}
       <motion.div
-        className="relative flex flex-wrap items-center justify-center gap-[0.6rem] sm:gap-3"
+        className="relative flex flex-nowrap items-center justify-center gap-[0.4rem] sm:gap-3 px-4 whitespace-nowrap"
         initial="hidden"
         animate="show"
         variants={{
@@ -58,7 +58,7 @@ export default function SplashScreen() {
             {/* GLOW */}
             <span
               aria-hidden
-              className="absolute pointer-events-none font-extrabold leading-none blur-[28px] text-[72px] sm:text-[88px]"
+              className="absolute pointer-events-none font-extrabold leading-none text-[10vw] sm:text-[72px] md:text-[80px] lg:text-[88px] blur-[22px] sm:blur-[28px]"
               style={{
                 color: l.color,
                 textShadow: `
@@ -74,7 +74,7 @@ export default function SplashScreen() {
 
             {/* MAIN COLORED LETTER */}
             <span
-              className="relative font-extrabold leading-none text-[72px] sm:text-[88px]"
+              className="relative font-extrabold leading-none text-[10vw] sm:text-[72px] md:text-[80px] lg:text-[88px]"
               style={{
                 color: l.color,
                 filter: `
@@ -89,7 +89,7 @@ export default function SplashScreen() {
             {/* EDGE LIGHT */}
             <span
               aria-hidden
-              className="absolute pointer-events-none font-extrabold leading-none text-[72px] sm:text-[88px]"
+              className="absolute pointer-events-none font-extrabold leading-none text-[10vw] sm:text-[72px] md:text-[80px] lg:text-[88px]"
               style={{
                 color: "transparent",
                 WebkitTextStroke: `2px ${l.color}`,
@@ -104,7 +104,7 @@ export default function SplashScreen() {
 
       {/* tagline */}
       <motion.div
-        className="mt-8 text-[11px] sm:text-[12px] tracking-[0.3em] text-white/60 uppercase text-center"
+        className="mt-8 text-[11px] sm:text-[12px] tracking-[0.3em] text-white/60 uppercase text-center px-6"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 2.2, duration: 1.2 }}

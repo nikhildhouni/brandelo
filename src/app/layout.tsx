@@ -2,6 +2,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+// ✅ Locomotive CSS import yahi pe
+import "locomotive-scroll/dist/locomotive-scroll.css";
+
 import AppShell from "@/components/AppShell";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
