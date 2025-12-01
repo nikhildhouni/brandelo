@@ -107,7 +107,7 @@ function fromRow(r: ClientRow): Client {
 }
 
 // ---------------------------------------------
-// Reusable SidePanel (drawer style using Dialog)
+// Reusable SidePanel (responsive centered modal)
 // ---------------------------------------------
 function SidePanel({
   open,
@@ -128,50 +128,43 @@ function SidePanel({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className={cn(
-          "p-0 gap-0 border-0 bg-transparent shadow-none",
-          "sm:max-w-none sm:w-screen sm:h-screen sm:rounded-none sm:border-0"
+          // size
+          "max-w-[95vw] sm:max-w-md p-0 gap-0",
+          // look & border
+          "rounded-xl border border-border bg-background shadow-xl",
+          "dark:border-neutral-700 dark:bg-neutral-900"
         )}
       >
-        {/* BACKDROP */}
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-[2px] sm:bg-black/50 dark:bg-black/70" />
+        {/* HEADER */}
+        <div className="border-b border-border/60 bg-muted/40 px-4 py-3 dark:border-neutral-700/60 dark:bg-neutral-800/50">
+          <DialogHeader className="p-0">
+            <DialogTitle className="text-base font-semibold leading-none tracking-[-0.03em] text-foreground dark:text-neutral-100">
+              {title}
+            </DialogTitle>
+            {description ? (
+              <DialogDescription className="text-[12px] leading-snug text-muted-foreground dark:text-neutral-400">
+                {description}
+              </DialogDescription>
+            ) : null}
+          </DialogHeader>
+        </div>
 
-        {/* PANEL WRAPPER */}
-        <div
-          className={cn(
-            "fixed inset-x-0 bottom-0 z-50 flex flex-col rounded-t-xl border border-border bg-background text-foreground shadow-xl dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-100",
-            "max-h-[90vh] overflow-hidden sm:inset-y-0 sm:right-0 sm:left-auto sm:h-full sm:max-h-full sm:w-[360px] sm:rounded-none sm:border-l sm:shadow-2xl dark:sm:border-neutral-800"
-          )}
-        >
-          {/* HEADER */}
-          <div className="flex-shrink-0 border-b border-border/60 bg-muted/30 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:border-neutral-700/60 dark:bg-neutral-800/50 dark:supports-[backdrop-filter]:bg-neutral-900/60">
-            <DialogHeader className="p-0">
-              <DialogTitle className="text-base font-semibold leading-none tracking-[-0.03em] text-foreground dark:text-neutral-100">
-                {title}
-              </DialogTitle>
-              {description ? (
-                <DialogDescription className="text-[12px] leading-snug text-muted-foreground dark:text-neutral-400">
-                  {description}
-                </DialogDescription>
-              ) : null}
-            </DialogHeader>
-          </div>
+        {/* BODY – scrollable within max height */}
+        <div className="max-h-[75vh] overflow-y-auto px-4 py-4 bg-background dark:bg-neutral-900 text-sm text-foreground dark:text-neutral-100">
+          {children}
+        </div>
 
-          {/* BODY */}
-          <div className="flex-1 overflow-y-auto px-4 py-4 bg-background dark:bg-neutral-900">
-            {children}
-          </div>
-
-          {/* FOOTER */}
-          <div className="flex-shrink-0 border-t border-border/60 bg-background/80 px-4 py-3 dark:border-neutral-700/60 dark:bg-neutral-900/80">
-            <DialogFooter className="flex flex-row justify-end gap-2 p-0 sm:gap-3">
-              {footer}
-            </DialogFooter>
-          </div>
+        {/* FOOTER */}
+        <div className="border-t border-border/60 bg-background/80 px-4 py-3 dark:border-neutral-700/60 dark:bg-neutral-900/80">
+          <DialogFooter className="flex flex-row justify-end gap-2 p-0 sm:gap-3">
+            {footer}
+          </DialogFooter>
         </div>
       </DialogContent>
     </Dialog>
   );
 }
+
 
 // ---------------------------------------------
 // PAGE
@@ -368,7 +361,7 @@ export default function ClientsPage() {
                   <h1 className="text-xl font-semibold leading-none tracking-[-0.03em] text-foreground dark:text-neutral-100">
                     Clients
                   </h1>
-                  <span className="inline-flex items-center rounded-full bg-muted/60 px-2 py-[2px] text-[10px] font-medium text-muted-foreground ring-1 ring-border dark:bg-neutral-800/80 dark:text-neutral-300 dark:ring-neutral-700">
+                  <span className="inline-flex items-center rounded-full bg-muted/60 px-2 py-0.5 text-[10px] font-medium text-muted-foreground ring-1 ring-border dark:bg-neutral-800/80 dark:text-neutral-300 dark:ring-neutral-700">
                     Digital Marketing CRM
                   </span>
                 </div>
@@ -383,7 +376,7 @@ export default function ClientsPage() {
                   <span className="font-medium text-foreground dark:text-neutral-100">
                     Active:
                   </span>
-                  <span className="inline-flex h-5 min-w-[1.5rem] items-center justify-center rounded-md bg-emerald-500/10 px-2 text-[10px] font-semibold text-emerald-600 ring-1 ring-emerald-600/20 dark:text-emerald-400 dark:ring-emerald-400/30">
+                  <span className="inline-flex h-5 min-w-6 items-center justify-center rounded-md bg-emerald-500/10 px-2 text-[10px] font-semibold text-emerald-600 ring-1 ring-emerald-600/20 dark:text-emerald-400 dark:ring-emerald-400/30">
                     {activeCount}
                   </span>
                 </div>
@@ -413,7 +406,7 @@ export default function ClientsPage() {
         </header>
 
         {/* FILTER BAR */}
-        <Card className="border-border/60 bg-background shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/80 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-100 dark:supports-[backdrop-filter]:bg-neutral-900/80">
+        <Card className="border-border/60 bg-background shadow-sm backdrop-blur supports-backdrop-filter:bg-background/80 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-100 dark:supports-backdrop-filter:bg-neutral-900/80">
           <CardContent className="flex flex-col gap-4 p-4 xl:flex-row xl:items-center xl:justify-between">
             <div className="flex flex-col gap-4 lg:flex-row lg:flex-1 lg:items-center">
               {/* Search */}
@@ -424,7 +417,7 @@ export default function ClientsPage() {
                 <Input
                   className={cn(
                     "h-9 rounded-lg pl-9 text-sm",
-                    "bg-background/60 backdrop-blur supports-[backdrop-filter]:bg-background/40 dark:bg-neutral-800/60 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:supports-[backdrop-filter]:bg-neutral-800/40"
+                    "bg-background/60 backdrop-blur supports-backdrop-filter:bg-background/40 dark:bg-neutral-800/60 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:supports-backdrop-filter:bg-neutral-800/40"
                   )}
                   placeholder="Search client, brand, website, phone…"
                   value={search}
@@ -474,8 +467,8 @@ export default function ClientsPage() {
           </CardContent>
         </Card>
 
-        {/* TABLE */}
-        <Card className="overflow-hidden border-border/60 bg-background shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/80 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-100 dark:supports-[backdrop-filter]:bg-neutral-900/80">
+        {/* TABLE + MOBILE LIST */}
+        <Card className="overflow-hidden border-border/60 bg-background shadow-sm backdrop-blur supports-backdrop-filter:bg-background/80 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-100 dark:supports-backdrop-filter:bg-neutral-900/80">
           <CardHeader className="border-b border-border/60 px-4 py-3 dark:border-neutral-700/60">
             <CardTitle className="flex flex-col text-[13px] font-medium text-muted-foreground sm:flex-row sm:items-center sm:gap-2 dark:text-neutral-400">
               <span className="text-sm font-semibold leading-none text-foreground dark:text-neutral-100">
@@ -488,78 +481,247 @@ export default function ClientsPage() {
             </CardTitle>
           </CardHeader>
 
-          <CardContent className="overflow-x-auto p-0">
-            <table className="min-w-[800px] w-full text-sm">
-              <thead>
-                <tr className="border-b border-border/60 bg-muted/40 text-[11px] uppercase tracking-wide text-muted-foreground dark:border-neutral-700/60 dark:bg-neutral-800/40 dark:text-neutral-400">
-                  <th className="py-3 pl-4 pr-2 text-left font-medium">
-                    Client
-                  </th>
-                  <th className="px-2 py-3 text-left font-medium">Phone</th>
-                  <th className="px-2 py-3 text-left font-medium">Email</th>
-                  <th className="px-2 py-3 text-left font-medium">
-                    Project / Brand
-                  </th>
-                  <th className="px-2 py-3 text-left font-medium">Service</th>
-                  <th className="px-2 py-3 text-left font-medium">
-                    Follow-up
-                  </th>
-                  <th className="px-2 py-3 text-left font-medium">Joined</th>
-                  <th className="px-2 py-3 text-left font-medium">Status</th>
-                  <th className="py-3 pr-4 pl-2 text-right font-medium">
-                    Action
-                  </th>
-                </tr>
-              </thead>
+          <CardContent className="p-0">
+            {/* DESKTOP / TABLET TABLE */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="min-w-[900px] w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border/60 bg-muted/40 text-[11px] uppercase tracking-wide text-muted-foreground dark:border-neutral-700/60 dark:bg-neutral-800/40 dark:text-neutral-400">
+                    <th className="py-3 pl-4 pr-2 text-left font-medium">
+                      Client
+                    </th>
+                    <th className="px-2 py-3 text-left font-medium">Phone</th>
+                    <th className="px-2 py-3 text-left font-medium">Email</th>
+                    <th className="px-2 py-3 text-left font-medium">
+                      Project / Brand
+                    </th>
+                    <th className="px-2 py-3 text-left font-medium">
+                      Service
+                    </th>
+                    <th className="px-2 py-3 text-left font-medium">
+                      Follow-up
+                    </th>
+                    <th className="px-2 py-3 text-left font-medium">Joined</th>
+                    <th className="px-2 py-3 text-left font-medium">Status</th>
+                    <th className="py-3 pr-4 pl-2 text-right font-medium">
+                      Action
+                    </th>
+                  </tr>
+                </thead>
 
-              <tbody className="text-[13px] text-foreground/90 dark:text-neutral-200">
-                {loading ? (
-                  <tr>
-                    <td
-                      className="px-4 py-10 text-center text-sm text-muted-foreground"
-                      colSpan={9}
-                    >
-                      Loading…
-                    </td>
-                  </tr>
-                ) : errorMsg ? (
-                  <tr>
-                    <td
-                      className="px-4 py-10 text-center text-sm text-red-500"
-                      colSpan={9}
-                    >
-                      {errorMsg}
-                    </td>
-                  </tr>
-                ) : filteredClients.length === 0 ? (
-                  <tr>
-                    <td
-                      className="px-4 py-10 text-center text-sm text-muted-foreground dark:text-neutral-500"
-                      colSpan={9}
-                    >
-                      No clients found
-                    </td>
-                  </tr>
-                ) : (
-                  filteredClients.map((c, idx) => (
-                    <tr
+                <tbody className="text-[13px] text-foreground/90 dark:text-neutral-200">
+                  {loading ? (
+                    <tr>
+                      <td
+                        className="px-4 py-10 text-center text-sm text-muted-foreground"
+                        colSpan={9}
+                      >
+                        Loading…
+                      </td>
+                    </tr>
+                  ) : errorMsg ? (
+                    <tr>
+                      <td
+                        className="px-4 py-10 text-center text-sm text-red-500"
+                        colSpan={9}
+                      >
+                        {errorMsg}
+                      </td>
+                    </tr>
+                  ) : filteredClients.length === 0 ? (
+                    <tr>
+                      <td
+                        className="px-4 py-10 text-center text-sm text-muted-foreground dark:text-neutral-500"
+                        colSpan={9}
+                      >
+                        No clients found
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredClients.map((c, idx) => (
+                      <tr
+                        key={c.id}
+                        className={cn(
+                          "group border-b border-border/60 transition-colors dark:border-neutral-800",
+                          "hover:bg-muted/30 dark:hover:bg-neutral-800/40",
+                          idx % 2 === 1
+                            ? "bg-muted/10 dark:bg-neutral-800/20"
+                            : "bg-transparent"
+                        )}
+                      >
+                        {/* Client */}
+                        <td className="py-4 pl-4 pr-2 align-top text-[13px] font-medium leading-[1.2] text-foreground dark:text-neutral-100">
+                          <div className="flex flex-col">
+                            <span className="truncate">{c.name}</span>
+                            <span className="text-[11px] font-normal text-muted-foreground dark:text-neutral-500">
+                              ID #{c.id.slice(0, 8)}
+                            </span>
+
+                            {(c.editedBy || c.editedAt) && (
+                              <div className="mt-1 text-[11px] text-muted-foreground dark:text-neutral-400">
+                                Edited
+                                {c.editedBy ? ` by ${c.editedBy}` : ""}
+                                {c.editedAt ? ` on ${c.editedAt}` : ""}
+                              </div>
+                            )}
+                          </div>
+                        </td>
+
+                        {/* Phone */}
+                        <td className="whitespace-nowrap py-4 px-2 align-top leading-[1.2] text-foreground dark:text-neutral-200">
+                          {c.phone || "-"}
+                        </td>
+
+                        {/* Email */}
+                        <td className="break-all py-4 px-2 align-top leading-[1.2] text-muted-foreground dark:text-neutral-400">
+                          {c.email || "-"}
+                        </td>
+
+                        {/* Project / Brand */}
+                        <td className="py-4 px-2 align-top leading-[1.2] text-foreground dark:text-neutral-100">
+                          {c.project}
+                        </td>
+
+                        {/* Service */}
+                        <td className="py-4 px-2 align-top leading-[1.2] text-foreground dark:text-neutral-100">
+                          <Select
+                            value={c.service}
+                            onValueChange={(val) =>
+                              updateClientInline(c.id, {
+                                service: val as ServiceType,
+                              })
+                            }
+                          >
+                            <SelectTrigger className="group-hover:bg-background h-8 w-[150px] rounded-md border-border bg-background/60 text-xs shadow-sm dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 dark:group-hover:bg-neutral-800">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100">
+                              <SelectItem value="Web Development">
+                                Web Development
+                              </SelectItem>
+                              <SelectItem value="SEO">SEO</SelectItem>
+                              <SelectItem value="SMM">SMM</SelectItem>
+                              <SelectItem value="Ads">Ads</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </td>
+
+                        {/* Follow-up */}
+                        <td className="py-4 px-2 align-top leading-[1.2] text-foreground dark:text-neutral-100">
+                          <Select
+                            value={c.followUp}
+                            onValueChange={(val) =>
+                              updateClientInline(c.id, {
+                                follow_up: val as FollowUpType,
+                              })
+                            }
+                          >
+                            <SelectTrigger className="group-hover:bg-background h-8 w-[110px] rounded-md border-border bg-background/60 text-xs shadow-sm dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 dark:group-hover:bg-neutral-800">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100">
+                              <SelectItem value="Daily">Daily</SelectItem>
+                              <SelectItem value="Weekly">Weekly</SelectItem>
+                              <SelectItem value="15 days">15 days</SelectItem>
+                              <SelectItem value="30 days">30 days</SelectItem>
+                              <SelectItem value="On Demand">
+                                On Demand
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </td>
+
+                        {/* Joined */}
+                        <td className="whitespace-nowrap py-4 px-2 align-top leading-[1.2] text-muted-foreground dark:text-neutral-500">
+                          {c.joined}
+                        </td>
+
+                        {/* Status */}
+                        <td className="py-4 px-2 align-top leading-[1.2]">
+                          <div className="flex flex-col gap-2">
+                            <div
+                              className={cn(
+                                "inline-flex w-fit items-center gap-1 rounded-md px-2 py-[2px] text-[10px] font-medium ring-1",
+                                c.active
+                                  ? "bg-emerald-500/10 text-emerald-600 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-400/30"
+                                  : "bg-zinc-500/10 text-zinc-600 ring-zinc-600/20 dark:bg-neutral-700/30 dark:text-neutral-400 dark:ring-neutral-500/30"
+                              )}
+                            >
+                              <span
+                                className={cn(
+                                  "h-1.5 w-1.5 rounded-full",
+                                  c.active
+                                    ? "bg-emerald-500 dark:bg-emerald-400"
+                                    : "bg-zinc-400 dark:bg-neutral-400"
+                                )}
+                              />
+                              <span>{c.active ? "Active" : "Inactive"}</span>
+                            </div>
+
+                            <div className="flex select-none items-center gap-2 text-[11px] text-muted-foreground dark:text-neutral-400">
+                              <Checkbox
+                                checked={c.active}
+                                onCheckedChange={() =>
+                                  updateClientInline(c.id, {
+                                    active: !c.active,
+                                  })
+                                }
+                                className="h-4 w-4 data-[state=checked]:border-emerald-500 data-[state=checked]:bg-emerald-500 dark:data-[state=checked]:border-emerald-400 dark:data-[state=checked]:bg-emerald-400"
+                              />
+                              <span className="leading-none">Enable</span>
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Action */}
+                        <td className="py-4 pr-4 pl-2 align-top text-right">
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            className="h-8 gap-1 rounded-md px-2 text-[12px] font-medium shadow-sm active:scale-[0.99]"
+                            onClick={() => handleDelete(c.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Delete
+                          </Button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* MOBILE: CARD LIST */}
+            <div className="block md:hidden">
+              {loading ? (
+                <div className="px-4 py-8 text-center text-sm text-muted-foreground">
+                  Loading…
+                </div>
+              ) : errorMsg ? (
+                <div className="px-4 py-8 text-center text-sm text-red-500">
+                  {errorMsg}
+                </div>
+              ) : filteredClients.length === 0 ? (
+                <div className="px-4 py-8 text-center text-sm text-muted-foreground">
+                  No clients found
+                </div>
+              ) : (
+                <div className="space-y-3 p-3">
+                  {filteredClients.map((c) => (
+                    <div
                       key={c.id}
-                      className={cn(
-                        "group border-b border-border/60 transition-colors dark:border-neutral-800",
-                        "hover:bg-muted/30 dark:hover:bg-neutral-800/40",
-                        idx % 2 === 1
-                          ? "bg-muted/10 dark:bg-neutral-800/20"
-                          : "bg-transparent"
-                      )}
+                      className="rounded-lg border border-border/60 bg-background/80 p-3 text-[13px] shadow-sm dark:border-neutral-700 dark:bg-neutral-900"
                     >
-                      {/* Client */}
-                      <td className="py-4 pl-4 pr-2 align-top text-[13px] font-medium leading-[1.2] text-foreground dark:text-neutral-100">
-                        <div className="flex flex-col">
-                          <span className="truncate">{c.name}</span>
-                          <span className="text-[11px] font-normal text-muted-foreground dark:text-neutral-500">
+                      {/* Header: name + status pill */}
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <div className="font-semibold leading-tight">
+                            {c.name}
+                          </div>
+                          <div className="text-[11px] text-muted-foreground dark:text-neutral-500">
                             ID #{c.id.slice(0, 8)}
-                          </span>
-
+                          </div>
                           {(c.editedBy || c.editedAt) && (
                             <div className="mt-1 text-[11px] text-muted-foreground dark:text-neutral-400">
                               Edited
@@ -568,133 +730,165 @@ export default function ClientsPage() {
                             </div>
                           )}
                         </div>
-                      </td>
 
-                      {/* Phone */}
-                      <td className="whitespace-nowrap py-4 px-2 align-top leading-[1.2] text-foreground dark:text-neutral-200">
-                        {c.phone || "-"}
-                      </td>
-
-                      {/* Email */}
-                      <td className="break-all py-4 px-2 align-top leading-[1.2] text-muted-foreground dark:text-neutral-400">
-                        {c.email || "-"}
-                      </td>
-
-                      {/* Project / Brand */}
-                      <td className="py-4 px-2 align-top leading-[1.2] text-foreground dark:text-neutral-100">
-                        {c.project}
-                      </td>
-
-                      {/* Service */}
-                      <td className="py-4 px-2 align-top leading-[1.2] text-foreground dark:text-neutral-100">
-                        <Select
-                          value={c.service}
-                          onValueChange={(val) =>
-                            updateClientInline(c.id, {
-                              service: val as ServiceType,
-                            })
-                          }
+                        <div
+                          className={cn(
+                            "inline-flex items-center gap-1 rounded-md px-2 py-[2px] text-[10px] font-medium ring-1",
+                            c.active
+                              ? "bg-emerald-500/10 text-emerald-600 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-400/30"
+                              : "bg-zinc-500/10 text-zinc-600 ring-zinc-600/20 dark:bg-neutral-700/30 dark:text-neutral-400 dark:ring-neutral-500/30"
+                          )}
                         >
-                          <SelectTrigger className="group-hover:bg-background h-8 w-[150px] rounded-md border-border bg-background/60 text-xs shadow-sm dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 dark:group-hover:bg-neutral-800">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent className="dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100">
-                            <SelectItem value="Web Development">
-                              Web Development
-                            </SelectItem>
-                            <SelectItem value="SEO">SEO</SelectItem>
-                            <SelectItem value="SMM">SMM</SelectItem>
-                            <SelectItem value="Ads">Ads</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </td>
-
-                      {/* Follow-up */}
-                      <td className="py-4 px-2 align-top leading-[1.2] text-foreground dark:text-neutral-100">
-                        <Select
-                          value={c.followUp}
-                          onValueChange={(val) =>
-                            updateClientInline(c.id, {
-                              follow_up: val as FollowUpType,
-                            })
-                          }
-                        >
-                          <SelectTrigger className="group-hover:bg-background h-8 w-[110px] rounded-md border-border bg-background/60 text-xs shadow-sm dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 dark:group-hover:bg-neutral-800">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent className="dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100">
-                            <SelectItem value="Daily">Daily</SelectItem>
-                            <SelectItem value="Weekly">Weekly</SelectItem>
-                            <SelectItem value="15 days">15 days</SelectItem>
-                            <SelectItem value="30 days">30 days</SelectItem>
-                            <SelectItem value="On Demand">
-                              On Demand
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </td>
-
-                      {/* Joined */}
-                      <td className="whitespace-nowrap py-4 px-2 align-top leading-[1.2] text-muted-foreground dark:text-neutral-500">
-                        {c.joined}
-                      </td>
-
-                      {/* Status */}
-                      <td className="py-4 px-2 align-top leading-[1.2]">
-                        <div className="flex flex-col gap-2">
-                          <div
+                          <span
                             className={cn(
-                              "inline-flex w-fit items-center gap-1 rounded-md px-2 py-[2px] text-[10px] font-medium ring-1",
+                              "h-1.5 w-1.5 rounded-full",
                               c.active
-                                ? "bg-emerald-500/10 text-emerald-600 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-400/30"
-                                : "bg-zinc-500/10 text-zinc-600 ring-zinc-600/20 dark:bg-neutral-700/30 dark:text-neutral-400 dark:ring-neutral-500/30"
+                                ? "bg-emerald-500 dark:bg-emerald-400"
+                                : "bg-zinc-400 dark:bg-neutral-400"
                             )}
-                          >
-                            <span
-                              className={cn(
-                                "h-1.5 w-1.5 rounded-full",
-                                c.active
-                                  ? "bg-emerald-500 dark:bg-emerald-400"
-                                  : "bg-zinc-400 dark:bg-neutral-400"
-                              )}
-                            />
-                            <span>{c.active ? "Active" : "Inactive"}</span>
-                          </div>
-
-                          <div className="flex select-none items-center gap-2 text-[11px] text-muted-foreground dark:text-neutral-400">
-                            <Checkbox
-                              checked={c.active}
-                              onCheckedChange={() =>
-                                updateClientInline(c.id, {
-                                  active: !c.active,
-                                })
-                              }
-                              className="h-4 w-4 data-[state=checked]:border-emerald-500 data-[state=checked]:bg-emerald-500 dark:data-[state=checked]:border-emerald-400 dark:data-[state=checked]:bg-emerald-400"
-                            />
-                            <span className="leading-none">Enable</span>
-                          </div>
+                          />
+                          <span>{c.active ? "Active" : "Inactive"}</span>
                         </div>
-                      </td>
+                      </div>
 
-                      {/* Action */}
-                      <td className="py-4 pr-4 pl-2 align-top text-right">
+                      {/* Body */}
+                      <div className="mt-2 space-y-1.5 text-[12px] text-muted-foreground dark:text-neutral-300">
+                        <div className="flex flex-wrap gap-x-3 gap-y-1">
+                          {c.phone && (
+                            <span className="truncate">
+                              <span className="font-medium text-foreground dark:text-neutral-100">
+                                Ph:
+                              </span>{" "}
+                              {c.phone}
+                            </span>
+                          )}
+                          {c.email && c.email !== "-" && (
+                            <span className="truncate">
+                              <span className="font-medium text-foreground dark:text-neutral-100">
+                                Email:
+                              </span>{" "}
+                              {c.email}
+                            </span>
+                          )}
+                        </div>
+
+                        {c.project && (
+                          <div className="truncate">
+                            <span className="font-medium text-foreground dark:text-neutral-100">
+                              Project:
+                            </span>{" "}
+                            {c.project}
+                          </div>
+                        )}
+
+                        <div className="flex flex-wrap gap-x-3 gap-y-1">
+                          <span>
+                            <span className="font-medium text-foreground dark:text-neutral-100">
+                              Service:
+                            </span>{" "}
+                            {c.service}
+                          </span>
+                          <span>
+                            <span className="font-medium text-foreground dark:text-neutral-100">
+                              Follow-up:
+                            </span>{" "}
+                            {c.followUp}
+                          </span>
+                        </div>
+
+                        <div>
+                          <span className="font-medium text-foreground dark:text-neutral-100">
+                            Joined:
+                          </span>{" "}
+                          {c.joined}
+                        </div>
+                      </div>
+
+                      {/* Inline editable selects on mobile */}
+                      <div className="mt-3 space-y-2">
+                        <div className="grid grid-cols-1 gap-2">
+                          <Select
+                            value={c.service}
+                            onValueChange={(val) =>
+                              updateClientInline(c.id, {
+                                service: val as ServiceType,
+                              })
+                            }
+                          >
+                            <SelectTrigger className="h-8 w-full rounded-md border-border bg-background/60 text-xs shadow-sm dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100">
+                              <SelectValue placeholder="Service" />
+                            </SelectTrigger>
+                            <SelectContent className="dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100">
+                              <SelectItem value="Web Development">
+                                Web Development
+                              </SelectItem>
+                              <SelectItem value="SEO">SEO</SelectItem>
+                              <SelectItem value="SMM">SMM</SelectItem>
+                              <SelectItem value="Ads">Ads</SelectItem>
+                            </SelectContent>
+                          </Select>
+
+                          <Select
+                            value={c.followUp}
+                            onValueChange={(val) =>
+                              updateClientInline(c.id, {
+                                follow_up: val as FollowUpType,
+                              })
+                            }
+                          >
+                            <SelectTrigger className="h-8 w-full rounded-md border-border bg-background/60 text-xs shadow-sm dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100">
+                              <SelectValue placeholder="Follow-up" />
+                            </SelectTrigger>
+                            <SelectContent className="dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100">
+                              <SelectItem value="Daily">Daily</SelectItem>
+                              <SelectItem value="Weekly">Weekly</SelectItem>
+                              <SelectItem value="15 days">15 days</SelectItem>
+                              <SelectItem value="30 days">30 days</SelectItem>
+                              <SelectItem value="On Demand">
+                                On Demand
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="flex items-center justify-between rounded-md border border-border/60 bg-muted/20 px-3 py-2 text-[12px] dark:border-neutral-700/60 dark:bg-neutral-800/40">
+                          <div className="space-y-0.5">
+                            <span className="text-[11px] font-medium text-foreground dark:text-neutral-100">
+                              Active status
+                            </span>
+                            <p className="text-[10px] leading-none text-muted-foreground dark:text-neutral-400">
+                              Show in active client list
+                            </p>
+                          </div>
+                          <Switch
+                            checked={c.active}
+                            onCheckedChange={() =>
+                              updateClientInline(c.id, { active: !c.active })
+                            }
+                            className="data-[state=checked]:bg-emerald-500 dark:data-[state=checked]:bg-emerald-400"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Footer actions */}
+                      <div className="mt-3 flex flex-wrap gap-2">
                         <Button
                           size="sm"
                           variant="destructive"
-                          className="h-8 gap-1 rounded-md px-2 text-[12px] font-medium shadow-sm active:scale-[0.99]"
+                          className="h-8 flex-1 min-w-[120px] gap-1 rounded-md px-2 text-[12px] font-medium shadow-sm active:scale-[0.99]"
                           onClick={() => handleDelete(c.id)}
                         >
                           <Trash2 className="h-4 w-4" />
                           Delete
                         </Button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
-            {/* PAGINATION (static) */}
+            {/* PAGINATION (static, shared) */}
             <div className="flex flex-col gap-3 border-t border-border/60 px-4 py-4 text-[12px] text-muted-foreground dark:border-neutral-700/60 dark:text-neutral-500 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2 leading-none">
                 <span className="text-muted-foreground dark:text-neutral-500">
@@ -854,7 +1048,7 @@ export default function ClientsPage() {
 
           {/* Active */}
           <div className="flex items-center justify-between rounded-md border border-border/60 bg-muted/20 px-3 py-2 dark:border-neutral-700/60 dark:bg-neutral-800/40">
-            <div className="space-y-[2px]">
+            <div className="space-y-0.5">
               <Label className="text-[12px] font-medium leading-none text-foreground dark:text-neutral-100">
                 Active status
               </Label>

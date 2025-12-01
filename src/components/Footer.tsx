@@ -12,7 +12,8 @@ import {
   Twitter,
   Linkedin,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { createClient } from "@/lib/supabase/client"; // 👈 ADD THIS
 
 type Props = {
   email?: string;
@@ -21,7 +22,10 @@ type Props = {
   hours?: string[];
   gst?: string;
   legal?: { label: string; href: string }[];
-  socials?: { type: "facebook" | "instagram" | "twitter" | "linkedin"; href: string }[];
+  socials?: {
+    type: "facebook" | "instagram" | "twitter" | "linkedin";
+    href: string;
+  }[];
 };
 
 export default function ContactFooterWDB({
@@ -44,7 +48,79 @@ export default function ContactFooterWDB({
     { type: "linkedin", href: "https://linkedin.com/" },
   ],
 }: Props) {
+  // 👇 Supabase client
+  const supabase = useMemo(() => createClient(), []);
+
+  // 🔹 form state
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [service, setService] = useState("");
+  const [number, setNumber] = useState("");
+  const [emailInput, setEmailInput] = useState("");
+
+  const [submitting, setSubmitting] = useState(false);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setSuccessMsg(null);
+    setErrorMsg(null);
+
+    if (!firstName.trim() || !number.trim() || !service) {
+      setErrorMsg("Please fill name, service and phone number.");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      const payload = {
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        service,
+        phone: number.trim(),
+        email: emailInput.trim(),
+        source: "website_footer", // optional tracking
+      };
+
+      const fullName = `${firstName} ${lastName}`.trim();
+
+      const { error } = await supabase.from("form_submissions").insert({
+        form_key: "simple_service",
+        form_title: "Service inquiry",
+        status: "new",
+
+        first_name: firstName.trim() || null,
+        last_name: lastName.trim() || null,
+        full_name: fullName || null,
+        email: emailInput.trim() || null,
+        phone: number.trim() || null,
+        service,
+        payload, // raw JSON
+      });
+
+      if (error) {
+        console.error(error);
+        setErrorMsg("Something went wrong. Please try again.");
+        return;
+      }
+
+      // reset form
+      setFirstName("");
+      setLastName("");
+      setService("");
+      setNumber("");
+      setEmailInput("");
+
+      setSuccessMsg("Thanks! We’ve received your details.");
+    } catch (err) {
+      console.error(err);
+      setErrorMsg("Unexpected error. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   return (
     <footer className="relative isolation-isolate overflow-hidden dark bg-[#0b1020] text-white">
@@ -54,8 +130,18 @@ export default function ContactFooterWDB({
         <div className="absolute inset-0 opacity-40 [mask-image:radial-gradient(70%_60%_at_50%_45%,black,transparent)]">
           <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              <pattern id="grid-footer" width="32" height="32" patternUnits="userSpaceOnUse">
-                <path d="M32 0H0V32" fill="none" stroke="white" strokeOpacity="0.06" />
+              <pattern
+                id="grid-footer"
+                width="32"
+                height="32"
+                patternUnits="userSpaceOnUse"
+              >
+                <path
+                  d="M32 0H0V32"
+                  fill="none"
+                  stroke="white"
+                  strokeOpacity="0.06"
+                />
               </pattern>
             </defs>
             <rect width="100%" height="100%" fill="url(#grid-footer)" />
@@ -71,7 +157,11 @@ export default function ContactFooterWDB({
           }}
         />
         <style jsx>{`
-          @keyframes spin { to { transform: rotate(360deg); } }
+          @keyframes spin {
+            to {
+              transform: rotate(360deg);
+            }
+          }
         `}</style>
       </div>
 
@@ -113,20 +203,27 @@ export default function ContactFooterWDB({
           <div className="md:col-span-7">
             <form
               className="grid grid-cols-1 gap-6 rounded-3xl border border-white/15 bg-white/5 p-6 backdrop-blur-xl shadow-2xl"
-              onSubmit={(e) => {
-                e.preventDefault();
-                // hook up your submit logic here
-              }}
+              onSubmit={handleSubmit} // 👈 HOOKED
             >
               {/* Name split first/last */}
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <Label>Name</Label>
                 <div className="hidden sm:block" />
-                <UnderlineInput placeholder="First Name" autoComplete="given-name" />
-                <UnderlineInput placeholder="Last Name" autoComplete="family-name" />
+                <UnderlineInput
+                  placeholder="First Name"
+                  autoComplete="given-name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                />
+                <UnderlineInput
+                  placeholder="Last Name"
+                  autoComplete="family-name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                />
               </div>
 
-              {/* Services select (fake underline style) */}
+              {/* Services select */}
               <div>
                 <Label>Services</Label>
                 <div className="relative">
@@ -135,7 +232,9 @@ export default function ContactFooterWDB({
                     onChange={(e) => setService(e.target.value)}
                     className="peer w-full appearance-none bg-transparent py-1.5 text-[15px] outline-none border-b border-white/30 focus:border-white transition-colors duration-300"
                   >
-                    <option value="" disabled>Select a service</option>
+                    <option value="" disabled>
+                      Select a service
+                    </option>
                     <option>SEO</option>
                     <option>Social Media Marketing</option>
                     <option>PPC</option>
@@ -151,22 +250,47 @@ export default function ContactFooterWDB({
               {/* Number */}
               <div>
                 <Label>Number</Label>
-                <UnderlineInput placeholder="+91" inputMode="tel" autoComplete="tel" />
+                <UnderlineInput
+                  placeholder="+91"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  value={number}
+                  onChange={(e) => setNumber(e.target.value)}
+                />
               </div>
 
               {/* Email */}
               <div>
                 <Label>Email</Label>
-                <UnderlineInput placeholder="@gmail.com" type="email" autoComplete="email" />
+                <UnderlineInput
+                  placeholder="@gmail.com"
+                  type="email"
+                  autoComplete="email"
+                  value={emailInput}
+                  onChange={(e) => setEmailInput(e.target.value)}
+                />
               </div>
+
+              {/* messages */}
+              {(errorMsg || successMsg) && (
+                <div className="text-[12px]">
+                  {errorMsg && (
+                    <p className="text-red-300">{errorMsg}</p>
+                  )}
+                  {successMsg && !errorMsg && (
+                    <p className="text-emerald-300">{successMsg}</p>
+                  )}
+                </div>
+              )}
 
               {/* Submit pill */}
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 px-5 py-2 text-sm font-semibold text-black shadow-[0_8px_30px_rgba(56,189,248,.35)] hover:opacity-95 active:scale-[0.98] transition"
+                  disabled={submitting}
+                  className="rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 px-5 py-2 text-sm font-semibold text-black shadow-[0_8px_30px_rgba(56,189,248,.35)] hover:opacity-95 active:scale-[0.98] transition disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Submit
+                  {submitting ? "Submitting..." : "Submit"}
                 </button>
               </div>
             </form>
@@ -183,7 +307,7 @@ export default function ContactFooterWDB({
             <span>{email}</span>
           </Link>
 
-          <div className="flex items-center justify-start gap-3 sm:justify-end">
+        <div className="flex items-center justify-start gap-3 sm:justify-end">
             <Phone className="h-5 w-5 text-emerald-300" />
             <span className="text-xl font-extrabold sm:text-2xl">{phone}</span>
           </div>
@@ -199,11 +323,9 @@ export default function ContactFooterWDB({
 
       {/* Bottom legal bar — glassy ribbon */}
       <div className="relative border-t border-white/10 bg-white/5 backdrop-blur-xl">
-        {/* subtle inner glow */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-white/10 to-transparent" />
         <div className="mx-auto max-w-7xl px-4 py-5 text-[13px]">
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
-            {/* links */}
             <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
               {legal.map((l) => (
                 <Link
@@ -216,17 +338,17 @@ export default function ContactFooterWDB({
               ))}
             </nav>
 
-            {/* GST + © */}
             <div className="text-center text-white/80">
               <div className="mb-1">
-                GST NO: <span className="font-semibold text-white">{gst}</span>
+                GST NO:{" "}
+                <span className="font-semibold text-white">{gst}</span>
               </div>
               <div>
-                ©{new Date().getFullYear()} Brandelo &nbsp; | &nbsp; All Rights Reserved
+                ©{new Date().getFullYear()} Brandelo &nbsp; | &nbsp; All
+                Rights Reserved
               </div>
             </div>
 
-            {/* spacer to balance layout */}
             <div className="hidden w-[140px] sm:block" />
           </div>
         </div>
@@ -240,7 +362,9 @@ function Label({ children }: { children: React.ReactNode }) {
   return <div className="mb-1 text-[18px] font-semibold">{children}</div>;
 }
 
-function UnderlineInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
+function UnderlineInput(
+  props: React.InputHTMLAttributes<HTMLInputElement>
+) {
   return (
     <input
       {...props}
@@ -257,7 +381,9 @@ function Social({
   href: string;
 }) {
   const Icon =
-    { facebook: Facebook, instagram: Instagram, twitter: Twitter, linkedin: Linkedin }[type];
+    { facebook: Facebook, instagram: Instagram, twitter: Twitter, linkedin: Linkedin }[
+      type
+    ];
 
   return (
     <Link
@@ -268,7 +394,7 @@ function Social({
       className={[
         "relative grid h-10 w-10 place-items-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur transition-all duration-200",
         "hover:bg-white/15 hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/60",
-        "overflow-hidden",
+        "overflow-hidden group",
       ].join(" ")}
     >
       <span className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
@@ -276,4 +402,3 @@ function Social({
     </Link>
   );
 }
-

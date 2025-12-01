@@ -250,7 +250,7 @@ export default async function DashboardPage() {
         </Card>
       </section>
 
-      {/* Recent leads table */}
+      {/* Recent leads table / cards */}
       <section>
         <Card className="border-slate-200 bg-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
@@ -270,97 +270,195 @@ export default async function DashboardPage() {
               View all →
             </Button>
           </CardHeader>
+
           <CardContent>
-            <Table>
-              <TableCaption className="text-[11px] text-muted-foreground">
-                Lead data powered by your Supabase tables.
-              </TableCaption>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[260px]">Lead</TableHead>
-                  <TableHead>Contact</TableHead>
-                  <TableHead>Source</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="hidden md:table-cell">
-                    Created
-                  </TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {recentLeads.map((row) => (
-                  <TableRow key={row.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-8 w-8 border border-slate-200">
-                          <AvatarFallback className="bg-slate-100 text-[11px] text-slate-700">
-                            {getInitials(row.full_name)}
-                          </AvatarFallback>
-                        </Avatar>
+            {/* DESKTOP / TABLET: TABLE VIEW */}
+            <div className="hidden md:block overflow-x-auto">
+              <Table className="min-w-[720px]">
+                <TableCaption className="text-[11px] text-muted-foreground">
+                  Lead data powered by your Supabase tables.
+                </TableCaption>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[260px]">Lead</TableHead>
+                    <TableHead>Contact</TableHead>
+                    <TableHead>Source</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="hidden md:table-cell">
+                      Created
+                    </TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {recentLeads.map((row) => (
+                    <TableRow key={row.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-8 w-8 border border-slate-200">
+                            <AvatarFallback className="bg-slate-100 text-[11px] text-slate-700">
+                              {getInitials(row.full_name)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="space-y-0.5">
+                            <p className="text-xs font-medium md:text-sm">
+                              {row.full_name}
+                            </p>
+                            <p className="text-[11px] text-muted-foreground">
+                              ID: #{row.id.slice(0, 8)}
+                            </p>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="align-middle text-xs">
                         <div className="space-y-0.5">
-                          <p className="text-xs font-medium md:text-sm">
-                            {row.full_name}
-                          </p>
+                          <p>{row.email || "—"}</p>
                           <p className="text-[11px] text-muted-foreground">
-                            ID: #{row.id.slice(0, 8)}
+                            {row.phone || ""}
                           </p>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="align-middle text-xs">
-                      <div className="space-y-0.5">
-                        <p>{row.email || "—"}</p>
-                        <p className="text-[11px] text-muted-foreground">
-                          {row.phone || ""}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell className="align-middle text-xs capitalize">
-                      <Badge
-                        variant="outline"
-                        className="rounded-full border-slate-200 bg-slate-50 text-[11px]"
-                      >
-                        {row.source || "unknown"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="align-middle text-xs">
-                      <Badge
-                        variant="outline"
-                        className={cn(
-                          "rounded-full border px-2 py-0 text-[11px] capitalize",
-                          getLeadStatusColor(row.status)
-                        )}
-                      >
-                        {row.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="hidden align-middle text-[11px] text-muted-foreground md:table-cell">
-                      {formatDateTime(row.created_at)}
-                    </TableCell>
-                    <TableCell className="align-middle text-right">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-8 rounded-full border-slate-200 text-[11px]"
-                      >
-                        Open
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                      </TableCell>
+                      <TableCell className="align-middle text-xs capitalize">
+                        <Badge
+                          variant="outline"
+                          className="rounded-full border-slate-200 bg-slate-50 text-[11px]"
+                        >
+                          {row.source || "unknown"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="align-middle text-xs">
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            "rounded-full border px-2 py-0 text-[11px] capitalize",
+                            getLeadStatusColor(row.status)
+                          )}
+                        >
+                          {row.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="hidden align-middle text-[11px] text-muted-foreground md:table-cell">
+                        {formatDateTime(row.created_at)}
+                      </TableCell>
+                      <TableCell className="align-middle text-right">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 rounded-full border-slate-200 text-[11px]"
+                        >
+                          Open
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
 
-                {recentLeads.length === 0 && (
-                  <TableRow>
-                    <TableCell
-                      colSpan={6}
-                      className="py-6 text-center text-xs text-muted-foreground"
+                  {recentLeads.length === 0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={6}
+                        className="py-6 text-center text-xs text-muted-foreground"
+                      >
+                        No Leads Yet – First Pick the data from Forms
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* MOBILE: CARD LIST VIEW */}
+            <div className="block md:hidden">
+              {recentLeads.length === 0 ? (
+                <p className="py-4 text-center text-xs text-muted-foreground">
+                  No Leads Yet – First Pick the data from Forms
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {recentLeads.map((row) => (
+                    <div
+                      key={row.id}
+                      className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-[13px]"
                     >
-                     No Leads Yet – First Pick the data from Forms
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                      {/* Top: avatar + name + status */}
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8 border border-slate-200">
+                            <AvatarFallback className="bg-slate-100 text-[11px] text-slate-700">
+                              {getInitials(row.full_name)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-medium">
+                              {row.full_name}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground">
+                              ID: #{row.id.slice(0, 8)}
+                            </p>
+                          </div>
+                        </div>
+
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            "rounded-full border px-2 py-0 text-[10px] capitalize",
+                            getLeadStatusColor(row.status)
+                          )}
+                        >
+                          {row.status}
+                        </Badge>
+                      </div>
+
+                      {/* Contact + source + date */}
+                      <div className="mt-2 space-y-1.5 text-[12px] text-slate-700">
+                        <div className="space-y-0.5">
+                          <div className="truncate">
+                            <span className="font-medium text-slate-900">
+                              Email:
+                            </span>{" "}
+                            {row.email || "—"}
+                          </div>
+                          {row.phone && (
+                            <div className="truncate">
+                              <span className="font-medium text-slate-900">
+                                Phone:
+                              </span>{" "}
+                              {row.phone}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Badge
+                            variant="outline"
+                            className="rounded-full border-slate-200 bg-white text-[10px] capitalize"
+                          >
+                            {row.source || "unknown"}
+                          </Badge>
+                          <span className="text-[10px] text-muted-foreground">
+                            {formatDateTime(row.created_at)}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="mt-3 flex justify-end">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 rounded-full border-slate-200 px-3 text-[11px]"
+                        >
+                          Open
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <p className="mt-3 text-center text-[11px] text-muted-foreground">
+                Lead data powered by your Supabase tables.
+              </p>
+            </div>
           </CardContent>
         </Card>
       </section>

@@ -85,7 +85,7 @@ type Lead = {
 };
 
 // ---------------- Utils ----------------
-function toDisplayDate(iso?: string | null) {3
+function toDisplayDate(iso?: string | null) {
   if (!iso) return "-";
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "-";
@@ -190,41 +190,42 @@ function SidePanel({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
+        // ✅ simple, responsive center modal
         className={cn(
-          "p-0 gap-0 border-0 bg-transparent shadow-none",
-          "sm:max-w-none sm:w-screen sm:h-screen sm:rounded-none sm:border-0"
+          "max-w-[95vw] sm:max-w-md p-0 gap-0 border border-border bg-background shadow-xl",
+          "rounded-xl"
         )}
       >
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-[2px] sm:bg-black/50 dark:bg-black/70" />
-        <div
-          className={cn(
-            "fixed inset-x-0 bottom-0 z-50 flex flex-col rounded-t-xl border border-border bg-background text-foreground shadow-xl dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-100",
-            "max-h-[90vh] overflow-hidden sm:inset-y-0 sm:right-0 sm:left-auto sm:h-full sm:w-[360px] sm:rounded-none sm:border-l sm:shadow-2xl dark:sm:border-neutral-800"
-          )}
-        >
-          <div className="flex-shrink-0 border-b border-border/60 bg-muted/30 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:border-neutral-700/60 dark:bg-neutral-800/50 dark:supports-[backdrop-filter]:bg-neutral-900/60">
-            <DialogHeader className="p-0">
-              <DialogTitle className="text-base font-semibold leading-none tracking-[-0.03em]">
-                {title}
-              </DialogTitle>
-              {description ? (
-                <DialogDescription className="text-[12px] leading-snug">
-                  {description}
-                </DialogDescription>
-              ) : null}
-            </DialogHeader>
-          </div>
-          <div className="flex-1 overflow-y-auto px-4 py-4">{children}</div>
-          <div className="flex-shrink-0 border-t border-border/60 bg-background/80 px-4 py-3">
-            <DialogFooter className="flex flex-row justify-end gap-2 p-0 sm:gap-3">
-              {footer}
-            </DialogFooter>
-          </div>
+        {/* HEADER */}
+        <div className="border-b border-border/60 bg-muted/40 px-4 py-3">
+          <DialogHeader className="p-0">
+            <DialogTitle className="text-base font-semibold leading-none tracking-[-0.03em]">
+              {title}
+            </DialogTitle>
+            {description ? (
+              <DialogDescription className="text-[12px] leading-snug">
+                {description}
+              </DialogDescription>
+            ) : null}
+          </DialogHeader>
+        </div>
+
+        {/* BODY – scrollable, fixed max height */}
+        <div className="max-h-[75vh] overflow-y-auto px-4 py-4 text-sm">
+          {children}
+        </div>
+
+        {/* FOOTER */}
+        <div className="border-t border-border/60 bg-background/80 px-4 py-3">
+          <DialogFooter className="flex flex-row justify-end gap-2 p-0 sm:gap-3">
+            {footer}
+          </DialogFooter>
         </div>
       </DialogContent>
     </Dialog>
   );
 }
+
 
 // ---------------- Page ----------------
 export default function LeadsPage() {
@@ -241,6 +242,7 @@ export default function LeadsPage() {
   const [trashLoading, setTrashLoading] = React.useState(false);
 
   // filters
+
   const [search, setSearch] = React.useState("");
   const [priorityFilter, setPriorityFilter] =
     React.useState<"all" | LeadPriority>("all");
@@ -328,21 +330,20 @@ export default function LeadsPage() {
       };
 
       const { data: created, error: upsertErr } = await supabase
-  .from("clients")
-  .upsert(
-    {
-      name: lead.name,
-      email,
-      phone: lead.phone,
-      project: lead.project || null,
-      service: "Web Development" as ServiceType,
-      follow_up: followUpByPriority[lead.priority], // 👈 yahi column
-      joined: todayISODate(),
-      active: true,
-    },
-    { onConflict: "phone,created_by", ignoreDuplicates: false }
-  )
-
+        .from("clients")
+        .upsert(
+          {
+            name: lead.name,
+            email,
+            phone: lead.phone,
+            project: lead.project || null,
+            service: "Web Development" as ServiceType,
+            follow_up: followUpByPriority[lead.priority],
+            joined: todayISODate(),
+            active: true,
+          },
+          { onConflict: "phone,created_by", ignoreDuplicates: false }
+        )
         .select("id")
         .single<{ id: string }>();
 
@@ -443,7 +444,7 @@ export default function LeadsPage() {
       phone: formPhone.trim(),
       email: formEmail.trim() || null,
       source: formSource.trim() || "facebook ads",
-      priority: priorityMapUiToDb[formPriority], // 👈 lowercase for DB
+      priority: priorityMapUiToDb[formPriority],
       last_contacted: todayISODate(),
       project: formProject.trim() || null,
       notes: formNotes.trim() || null,
@@ -501,7 +502,6 @@ export default function LeadsPage() {
       l.email === "-" ? "" : l.email,
       l.phone,
       l.source,
-      // export UI priority (Hot/Warm/Cold) – import logic will lowercase
       l.priority,
       (() => {
         const parts = l.lastContacted.split("/");
@@ -937,7 +937,7 @@ export default function LeadsPage() {
           </CardContent>
         </Card>
 
-        {/* TABLE */}
+        {/* TABLE / MOBILE LIST */}
         <Card className="overflow-hidden border-border/60 bg-background shadow-sm">
           <CardHeader className="border-b border-border/60 px-4 py-3">
             <CardTitle className="flex flex-col text-[13px] font-medium text-muted-foreground sm:flex-row sm:items-center sm:gap-2">
@@ -951,124 +951,253 @@ export default function LeadsPage() {
             </CardTitle>
           </CardHeader>
 
-          <CardContent className="overflow-x-auto p-0">
-            <table className="min-w-[1100px] w-full text-sm">
-              <thead>
-                <tr className="border-b border-border/60 bg-muted/40 text-[11px] uppercase tracking-wide text-muted-foreground">
-                  {tableHeaders.map((h) => (
-                    <th key={h.key} className={h.className}>
-                      {h.label}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-
-              <tbody className="text-[13px]">
-                {filteredLeads.length === 0 ? (
-                  <tr>
-                    <td
-                      className="px-4 py-10 text-center text-sm text-muted-foreground"
-                      colSpan={tableHeaders.length}
-                    >
-                      {loading ? "Loading…" : "No leads match your filters"}
-                    </td>
+          <CardContent className="p-0">
+            {/* DESKTOP / TABLET TABLE */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full min-w-[1000px] text-sm">
+                <thead>
+                  <tr className="border-b border-border/60 bg-muted/40 text-[11px] uppercase tracking-wide text-muted-foreground">
+                    {tableHeaders.map((h) => (
+                      <th key={h.key} className={h.className}>
+                        {h.label}
+                      </th>
+                    ))}
                   </tr>
-                ) : (
-                  filteredLeads.map((lead, idx) => (
-                    <tr
-                      key={lead.id}
-                      className={cn(
-                        "group border-b border-border/60 transition-colors",
-                        "hover:bg-muted/30",
-                        idx % 2 === 1 ? "bg-muted/10" : "bg-transparent"
-                      )}
-                    >
-                      <td className="py-4 pl-4 pr-2 align-top font-medium leading-[1.2]">
-                        <div className="flex flex-col">
-                          <span className="truncate">{lead.name}</span>
-                          <span className="text-[11px] font-normal text-muted-foreground">
-                            ID #{lead.id.slice(0, 8)}
-                          </span>
+                </thead>
 
-                          {(lead.editedBy || lead.editedAt) && (
-                            <div className="mt-1 text-[11px] text-muted-foreground">
-                              Edited
-                              {lead.editedBy ? ` by ${lead.editedBy}` : ""}
-                              {lead.editedAt ? ` on ${lead.editedAt}` : ""}
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="break-all py-4 px-2 align-top leading-[1.2] text-muted-foreground">
-                        {lead.email || "-"}
-                      </td>
-                      <td className="whitespace-nowrap py-4 px-2 align-top leading-[1.2]">
-                        {lead.phone || "-"}
-                      </td>
-                      <td className="py-4 px-2 align-top leading-[1.2] text-muted-foreground">
-                        {lead.source || "-"}
-                      </td>
-                      <td className="py-4 px-2 align-top leading-[1.2]">
-                        <PriorityBadge priority={lead.priority} />
-                      </td>
-                      <td className="py-4 px-2 align-top leading-[1.2]">
-                        {lead.project || "-"}
-                      </td>
-                      <td className="py-4 px-2 align-top leading-[1.2] text-muted-foreground">
-                        {lead.notes ? (
-                          <span title={lead.notes}>
-                            {lead.notes.length > 60
-                              ? lead.notes.slice(0, 60) + "…"
-                              : lead.notes}
-                          </span>
-                        ) : (
-                          "-"
-                        )}
-                      </td>
-                      <td className="whitespace-nowrap py-4 px-2 align-top leading-[1.2] text-muted-foreground">
-                        {lead.lastContacted}
-                      </td>
-                      <td className="py-4 px-2 align-top leading-[1.2]">
-                        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-8 whitespace-nowrap rounded-md border-border bg-background/50 px-2 text-[12px] font-medium shadow-sm hover:bg-background"
-                            onClick={() => void convertToClient(lead)}
-                            aria-label={`Convert ${lead.name} to client`}
-                          >
-                            Convert → Client
-                          </Button>
-
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-8 whitespace-nowrap gap-1 rounded-md border-border bg-background/50 px-2 text-[12px] font-medium shadow-sm hover:bg-background"
-                            onClick={() => openEditDrawer(lead)}
-                            aria-label={`Edit ${lead.name}`}
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                            Edit
-                          </Button>
-
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-8 whitespace-nowrap gap-1 rounded-md border-red-300/60 bg-red-500/5 px-2 text-[12px] font-medium text-red-600 shadow-sm hover:bg-red-500/10"
-                            onClick={() => void moveToTrash(lead.id)}
-                            aria-label={`Move ${lead.name} to trash`}
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                            <span>Move to Trash</span>
-                          </Button>
-                        </div>
+                <tbody className="text-[13px]">
+                  {filteredLeads.length === 0 ? (
+                    <tr>
+                      <td
+                        className="px-4 py-10 text-center text-sm text-muted-foreground"
+                        colSpan={tableHeaders.length}
+                      >
+                        {loading ? "Loading…" : "No leads match your filters"}
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ) : (
+                    filteredLeads.map((lead, idx) => (
+                      <tr
+                        key={lead.id}
+                        className={cn(
+                          "group border-b border-border/60 transition-colors",
+                          "hover:bg-muted/30",
+                          idx % 2 === 1 ? "bg-muted/10" : "bg-transparent"
+                        )}
+                      >
+                        <td className="py-4 pl-4 pr-2 align-top font-medium leading-[1.2]">
+                          <div className="flex flex-col">
+                            <span className="truncate">{lead.name}</span>
+                            <span className="text-[11px] font-normal text-muted-foreground">
+                              ID #{lead.id.slice(0, 8)}
+                            </span>
 
+                            {(lead.editedBy || lead.editedAt) && (
+                              <div className="mt-1 text-[11px] text-muted-foreground">
+                                Edited
+                                {lead.editedBy ? ` by ${lead.editedBy}` : ""}
+                                {lead.editedAt ? ` on ${lead.editedAt}` : ""}
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                        <td className="break-all py-4 px-2 align-top leading-[1.2] text-muted-foreground">
+                          {lead.email || "-"}
+                        </td>
+                        <td className="whitespace-nowrap py-4 px-2 align-top leading-[1.2]">
+                          {lead.phone || "-"}
+                        </td>
+                        <td className="py-4 px-2 align-top leading-[1.2] text-muted-foreground">
+                          {lead.source || "-"}
+                        </td>
+                        <td className="py-4 px-2 align-top leading-[1.2]">
+                          <PriorityBadge priority={lead.priority} />
+                        </td>
+                        <td className="py-4 px-2 align-top leading-[1.2]">
+                          {lead.project || "-"}
+                        </td>
+                        <td className="py-4 px-2 align-top leading-[1.2] text-muted-foreground">
+                          {lead.notes ? (
+                            <span title={lead.notes}>
+                              {lead.notes.length > 60
+                                ? lead.notes.slice(0, 60) + "…"
+                                : lead.notes}
+                            </span>
+                          ) : (
+                            "-"
+                          )}
+                        </td>
+                        <td className="whitespace-nowrap py-4 px-2 align-top leading-[1.2] text-muted-foreground">
+                          {lead.lastContacted}
+                        </td>
+                        <td className="py-4 px-2 align-top leading-[1.2]">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-8 whitespace-nowrap rounded-md border-border bg-background/50 px-2 text-[12px] font-medium shadow-sm hover:bg-background"
+                              onClick={() => void convertToClient(lead)}
+                              aria-label={`Convert ${lead.name} to client`}
+                            >
+                              Convert → Client
+                            </Button>
+
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-8 whitespace-nowrap gap-1 rounded-md border-border bg-background/50 px-2 text-[12px] font-medium shadow-sm hover:bg-background"
+                              onClick={() => openEditDrawer(lead)}
+                              aria-label={`Edit ${lead.name}`}
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                              Edit
+                            </Button>
+
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-8 whitespace-nowrap gap-1 rounded-md border-red-300/60 bg-red-500/5 px-2 text-[12px] font-medium text-red-600 shadow-sm hover:bg-red-500/10"
+                              onClick={() => void moveToTrash(lead.id)}
+                              aria-label={`Move ${lead.name} to trash`}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                              <span>Move to Trash</span>
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* MOBILE: CARD LIST */}
+            <div className="block md:hidden">
+              {filteredLeads.length === 0 ? (
+                <div className="px-4 py-8 text-center text-sm text-muted-foreground">
+                  {loading ? "Loading…" : "No leads match your filters"}
+                </div>
+              ) : (
+                <div className="space-y-3 p-3">
+                  {filteredLeads.map((lead) => (
+                    <div
+                      key={lead.id}
+                      className="rounded-lg border border-border/60 bg-background/80 p-3 text-[13px] shadow-sm"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <div className="font-semibold leading-tight">
+                            {lead.name}
+                          </div>
+                          <div className="text-[11px] text-muted-foreground">
+                            ID #{lead.id.slice(0, 8)}
+                          </div>
+                        </div>
+                        <PriorityBadge priority={lead.priority} />
+                      </div>
+
+                      <div className="mt-2 space-y-1.5 text-[12px] text-muted-foreground">
+                        {lead.project && (
+                          <div className="truncate">
+                            <span className="font-medium text-foreground">
+                              Project:
+                            </span>{" "}
+                            {lead.project}
+                          </div>
+                        )}
+
+                        <div className="flex flex-wrap gap-x-3 gap-y-1">
+                          {lead.phone && (
+                            <span className="truncate">
+                              <span className="font-medium text-foreground">
+                                Ph:
+                              </span>{" "}
+                              {lead.phone}
+                            </span>
+                          )}
+                          {lead.email && lead.email !== "-" && (
+                            <span className="truncate">
+                              <span className="font-medium text-foreground">
+                                Email:
+                              </span>{" "}
+                              {lead.email}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex flex-wrap gap-x-3 gap-y-1">
+                          {lead.source && (
+                            <span className="truncate">
+                              <span className="font-medium text-foreground">
+                                Source:
+                              </span>{" "}
+                              {lead.source}
+                            </span>
+                          )}
+                          <span>
+                            <span className="font-medium text-foreground">
+                              Last:
+                            </span>{" "}
+                            {lead.lastContacted}
+                          </span>
+                        </div>
+
+                        {lead.notes && (
+                          <div className="truncate">
+                            <span className="font-medium text-foreground">
+                              Notes:
+                            </span>{" "}
+                            {lead.notes.length > 80
+                              ? lead.notes.slice(0, 80) + "…"
+                              : lead.notes}
+                          </div>
+                        )}
+
+                        {(lead.editedBy || lead.editedAt) && (
+                          <div className="pt-1 text-[11px] text-muted-foreground">
+                            Edited
+                            {lead.editedBy ? ` by ${lead.editedBy}` : ""}
+                            {lead.editedAt ? ` on ${lead.editedAt}` : ""}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-8 flex-1 min-w-[120px] rounded-md border-border bg-background/50 px-2 text-[12px] font-medium shadow-sm hover:bg-background"
+                          onClick={() => void convertToClient(lead)}
+                        >
+                          Convert → Client
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-8 flex-1 min-w-[90px] gap-1 rounded-md border-border bg-background/50 px-2 text-[12px] font-medium shadow-sm hover:bg-background"
+                          onClick={() => openEditDrawer(lead)}
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                          Edit
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-8 flex-1 min-w-[120px] gap-1 rounded-md border-red-300/60 bg-red-500/5 px-2 text-[12px] font-medium text-red-600 shadow-sm hover:bg-red-500/10"
+                          onClick={() => void moveToTrash(lead.id)}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                          Trash
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* FOOTER (shared) */}
             <div className="flex flex-col gap-3 border-t border-border/60 px-4 py-4 text-[12px] text-muted-foreground lg:flex-row lg:items-center lg:justify-between">
               <div>
                 Showing{" "}

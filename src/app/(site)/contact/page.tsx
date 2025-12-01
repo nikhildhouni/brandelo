@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useMotionTemplate, useSpring } from "framer-motion";
-import { useRef, useState, type MouseEvent } from "react";
+import { useRef, useState, useMemo, type MouseEvent } from "react";
 import {
   Mail,
   Phone,
@@ -14,6 +14,7 @@ import {
   Trophy,
   Sparkles,
 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client"; // 👈 ADD THIS
 
 /** Framer Motion v11 wants tuple easings, not strings */
 const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
@@ -45,16 +46,85 @@ function useCardGlow() {
 
 export default function ContactPage() {
   const { ref, maskImage, handleMouseMove } = useCardGlow();
+  const supabase = useMemo(() => createClient(), []); // 👈 Supabase client
+
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null); // 👈 error state
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setSent(false);
+    setErrorMsg(null);
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 900));
-    setSent(true);
-    setLoading(false);
-    (e.currentTarget as HTMLFormElement).reset();
+
+    try {
+      const form = e.currentTarget;
+      const formData = new FormData(form);
+
+      const fullName = (formData.get("name") as string | null)?.trim() || "";
+      const email = (formData.get("email") as string | null)?.trim() || "";
+      const phone = (formData.get("phone") as string | null)?.trim() || "";
+      const budget = (formData.get("budget") as string | null)?.trim() || "";
+      const timeline =
+        (formData.get("timeline") as string | null)?.trim() || "";
+      const message =
+        (formData.get("message") as string | null)?.trim() || "";
+
+      const services = formData
+        .getAll("services")
+        .map((v) => String(v))
+        .filter(Boolean);
+
+      // basic validation
+      if (!fullName || !email || !phone) {
+        setErrorMsg("Name, email aur phone required hai 🙂");
+        setLoading(false);
+        return;
+      }
+
+      const payload = {
+        fullName,
+        email,
+        phone,
+        budget,
+        timeline,
+        servicesInterested: services,
+        projectBrief: message,
+        source: "contact_page",
+      };
+
+      const { error } = await supabase.from("form_submissions").insert({
+        form_key: "growth_project",
+        form_title: "Start your growth project",
+        status: "new",
+
+        full_name: fullName || null,
+        email: email || null,
+        phone: phone || null,
+        budget: budget || null,
+        timeline: timeline || null,
+        services_interested: services,
+        message: message || null,
+
+        payload,
+      });
+
+      if (error) {
+        console.error(error);
+        setErrorMsg("Kuch galat ho gaya, please dubara try karo.");
+        setLoading(false);
+        return;
+      }
+
+      form.reset();
+      setSent(true);
+    } catch (err) {
+      console.error(err);
+      setErrorMsg("Unexpected error, thodi der baad try karo.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -187,16 +257,25 @@ export default function ContactPage() {
                     </div>
 
                     <div>
-                      <span className="block text-sm font-medium mb-2">Services interested</span>
+                      <span className="block text-sm font-medium mb-2">
+                        Services interested
+                      </span>
                       <div className="flex flex-wrap gap-2">
-                        {["SEO", "Paid Ads", "Social", "CRO", "Web Dev", "Content"].map((tag) => (
-                          <label key={tag} className="cursor-pointer">
-                            <input type="checkbox" name="services" value={tag} className="peer sr-only" />
-                            <span className="inline-flex items-center rounded-full px-3 py-1 text-sm ring-1 ring-white/20 peer-checked:bg-emerald-500 peer-checked:text-white transition">
-                              {tag}
-                            </span>
-                          </label>
-                        ))}
+                        {["SEO", "Paid Ads", "Social", "CRO", "Web Dev", "Content"].map(
+                          (tag) => (
+                            <label key={tag} className="cursor-pointer">
+                              <input
+                                type="checkbox"
+                                name="services"
+                                value={tag}
+                                className="peer sr-only"
+                              />
+                              <span className="inline-flex items-center rounded-full px-3 py-1 text-sm ring-1 ring-white/20 peer-checked:bg-emerald-500 peer-checked:text-white transition">
+                                {tag}
+                              </span>
+                            </label>
+                          )
+                        )}
                       </div>
                     </div>
 
@@ -222,11 +301,17 @@ export default function ContactPage() {
                         disabled={loading}
                         className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-6 py-2.5 font-semibold text-white shadow hover:bg-emerald-700 disabled:opacity-60"
                       >
-                        {loading ? "Sending…" : "Get proposal"} <ArrowRight size={16} />
+                        {loading ? "Sending…" : "Get proposal"}{" "}
+                        <ArrowRight size={16} />
                       </motion.button>
                     </div>
 
-                    {sent && (
+                    {/* error / success messages */}
+                    {errorMsg && (
+                      <p className="text-xs text-red-300">{errorMsg}</p>
+                    )}
+
+                    {sent && !errorMsg && (
                       <motion.div
                         initial={{ opacity: 0, y: -6 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -241,6 +326,10 @@ export default function ContactPage() {
                 </div>
               </div>
             </motion.div>
+
+            {/* Right column ... (unchanged) */}
+            {/* ... keep rest of your component same as before ... */}
+
 
             {/* Right column */}
             <div className="space-y-8 relative z-10">
